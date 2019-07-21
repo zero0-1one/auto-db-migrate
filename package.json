@@ -1,0 +1,33 @@
+{
+  "name": "zo-theone-upgrade",
+  "version": "0.0.2",
+  "description": "Version management tool for theone framework",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [
+    "theone",
+    "server",
+    "app",
+    "koa",
+    "framework",
+    "upgrade",
+    "web"
+  ],
+  "engines": {
+    "node": ">= 10.0.0"
+  },
+  "dependencies": {
+    "compare-versions": "^3.4.0",
+    "require-all": "^3.0.0"
+  },
+  "devDependencies": {},
+  "author": "zero0-1one",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zero0-1one/theone-upgrade.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zero0-1one/theone-upgrade/issues"
+  }
+}
