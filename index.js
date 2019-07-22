@@ -12,6 +12,15 @@ class Upgrade {
   constructor(theone) {
     this.theone = theone
   }
+
+  mkdirs(dirpath) {
+    if (fs.existsSync(dirpath)) {
+      return
+    }
+    this.mkdirs(path.dirname(dirpath))
+    fs.mkdirSync(dirpath)
+  }
+
   /**
    * group 定义表接口分类和顺序
    * 如：{
@@ -25,7 +34,7 @@ class Upgrade {
   async dumpStructure(dbName, dir, group = {}) {
     let theone = this.theone
     theone.log.info(`[${dbName}]数据库结构导出中。。。`)
-
+    this.mkdirs(dir)
     if (!group.structure) group.structure = []
 
     let groupTables = new Set()
