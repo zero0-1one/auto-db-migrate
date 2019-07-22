@@ -13,7 +13,7 @@ class Upgrade {
     this.theone = theone
   }
   /**
-   * dir 目录下 可创建一个 group.js 文件来配置导出的表接口分类和顺序
+   * group 定义表接口分类和顺序
    * 如：{
    *  'fileA':['a1', 'a2'],
    *  'fileB':['b1', 'a3'],
@@ -22,14 +22,10 @@ class Upgrade {
    * 如果没定义的表 就会写入 structure.sql
    * */
 
-  async dumpStructure(dbName, dir) {
+  async dumpStructure(dbName, dir, group = {}) {
     let theone = this.theone
     theone.log.info(`[${dbName}]数据库结构导出中。。。`)
 
-    let group = {}
-    if (fs.existsSync(path.join(dir, 'group.js'))) {
-      group = require(path.join(dir, 'group.js'))
-    }
     if (!group.structure) group.structure = []
 
     let groupTables = new Set()
