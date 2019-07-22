@@ -28,14 +28,14 @@ class Upgrade {
    *  'fileB':['b1', 'a3'],
    * }
    * a1, a2 表结构就会写入 fileA.sql
-   * 如果没定义的表 就会写入 structure.sql
+   * 如果没定义的表 就会写入 struct.sql
    * */
 
-  async dumpStructure(dbName, dir, group = {}) {
+  async dumpStructure(dbName, dir, group = {}, prefix = '') {
     let theone = this.theone
     theone.log.info(`[${dbName}]数据库结构导出中。。。`)
     this.mkdirs(dir)
-    if (!group.structure) group.structure = []
+    if (!group.struct) group.struct = []
 
     let groupTables = new Set()
     for (const fileName in group) {
@@ -48,21 +48,21 @@ class Upgrade {
     let colName = 'Tables_in_' + options.database
     await theone.Db.transaction(async  db => {
       let tables = await db.execute('SHOW TABLES')
-      let structures = {}
+      let structs = {}
       for (const row of tables) {
         let tableName = row[colName]
-        structures[tableName] = (await db.executeOne(
+        structs[tableName] = (await db.executeOne(
           'SHOW CREATE TABLE ' + tableName
         ))['Create Table']
-        if (!groupTables.has(tableName)) group.structure.push(tableName)
+        if (!groupTables.has(tableName)) group.struct.push(tableName)
       }
 
       for (const fileName in group) {
         let contents = group[fileName].map(tableName => {
-          if (!structures[tableName]) theone.log.console.warn(`[${dbName}]数据库不存在 table:${fileName}`)
-          return structures[tableName] || ''
+          if (!structs[tableName]) theone.log.console.warn(`[${dbName}]数据库不存在 table:${fileName}`)
+          return structs[tableName] || ''
         }).join(';\n\n\n')
-        fs.writeFileSync(path.join(dir, fileName + '.sql'), contents)
+        fs.writeFileSync(path.join(dir, prefix + fileName + '.sql'), contents)
       }
     }, options)
     theone.log.info(`[${dbName}]数据库结构导出完成。。。`)
