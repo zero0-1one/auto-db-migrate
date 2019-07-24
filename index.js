@@ -62,7 +62,7 @@ class Upgrade {
           if (!structs[tableName]) theone.log.console.warn(`[${dbName}]数据库不存在 table:${fileName}`)
           return structs[tableName] || ''
         }).join(';\n\n\n')
-        fs.writeFileSync(path.join(dir, prefix + fileName + '.sql'), contents)
+        if (contents) fs.writeFileSync(path.join(dir, prefix + fileName + '.sql'), contents)
       }
     }, options)
     theone.log.info(`[${dbName}]数据库结构导出完成。。。`)
