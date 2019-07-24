@@ -7,7 +7,6 @@ const requireAll = require('require-all')
 const compareVersions = require('compare-versions')
 
 
-
 class Upgrade {
   constructor(theone) {
     this.theone = theone
@@ -72,13 +71,14 @@ class Upgrade {
     theone.log.info(`[${dbName}]数据库结构导出完成。。。`)
   }
 
-  async upgrade(dbName, dir, prefix = 'theone') {
+  async upgrade(dbName, dir, prefix = 'theone', beginVersion = '') {
     let theone = this.theone
     theone.log.info(`[${dbName}]版本升级中。。。`)
     let tableName = prefix + '_upgrade'
     let all = requireAll(dir)
     let upgrades = []
     for (const version in all) {
+      if (beginVersion && compareVersions(version, beginVersion) < 0) continue
       upgrades.push([version, all[version]])
     }
     upgrades.sort((a, b) => compareVersions(a[0], b[0]))
