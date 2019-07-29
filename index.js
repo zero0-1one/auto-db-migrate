@@ -58,7 +58,7 @@ class Upgrade {
 
       for (const fileName in group) {
         let contents = group[fileName].map(tableName => {
-          if (!structs[tableName]) theone.log.console.warn(`[${dbName}]数据库不存在 table:${fileName}`)
+          if (!structs[tableName]) theone.warn(`[${dbName}]数据库不存在 table:${fileName}`)
           return structs[tableName] || ''
         }).join(';\n\n\n')
         if (contents) {
