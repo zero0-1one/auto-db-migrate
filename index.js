@@ -20,6 +20,11 @@ class Upgrade {
     fs.mkdirSync(dirpath)
   }
 
+  filterCreateSql(sql) {
+    sql = sql.replace(/[ ]*AUTO_INCREMENT=[0-9]+/, '')
+    return sql
+  }
+
   /**
    * group 定义表接口分类和顺序
    * 如：{
@@ -29,7 +34,6 @@ class Upgrade {
    * a1, a2 表结构就会写入 fileA.sql
    * 如果没定义的表 就会写入 struct.sql
    * */
-
   async dumpStructure(dbName, dir, group = {}, prefix = '') {
     let theone = this.theone
     theone.log.info(`[${dbName}]数据库结构导出中。。。`)
@@ -50,21 +54,23 @@ class Upgrade {
       let structs = {}
       for (const row of tables) {
         let tableName = row[colName]
-        structs[tableName] = (await db.executeOne(
+        let createSql = (await db.executeOne(
           'SHOW CREATE TABLE ' + tableName
         ))['Create Table']
+        structs[tableName] = this.filterCreateSql(createSql)
         if (!groupTables.has(tableName)) group.struct.push(tableName)
       }
 
       for (const fileName in group) {
         let contents = group[fileName].map(tableName => {
-          if (!structs[tableName]) theone.warn(`[${dbName}]数据库不存在 table:${fileName}`)
+          if (!structs[tableName]) theone.warn(`[${dbName}]数据库不存在 table:${tableName}`)
           return structs[tableName] || ''
         }).join(';\n\n\n')
+        let filePath = path.join(dir, prefix + fileName + '.sql')
         if (contents) {
-          fs.writeFileSync(path.join(dir, prefix + fileName + '.sql'), contents)
+          fs.writeFileSync(filePath, contents + ';')
         } else {
-          fs.unlinkSync(path.join(dir, prefix + fileName + '.sql'))
+          if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
         }
       }
     }, options)
@@ -84,20 +90,19 @@ class Upgrade {
     upgrades.sort((a, b) => compareVersions(a[0], b[0]))
     let options = theone.config.databaseMap[dbName]
 
-    //创建一个 立即commit的 db 连接， 专门用来记录更新日志
-    let opts = Object.assign({}, options)
-    delete opts['mustInTrans']
-    let noTransDb = new theone.Db(opts)
-    await noTransDb.execute(
-      `CREATE TABLE IF NOT EXISTS ${tableName} (
+    await theone.Db.transaction(async  db => {
+      await db.execute(
+        `CREATE TABLE IF NOT EXISTS ${tableName} (
         u_sVersion varchar(255) NOT NULL,
         u_sName varchar(255) NOT NULL,
         u_dtTime datetime NOT NULL DEFAULT NOW(),
-        u_uStatus tinyint unsigned NOT NULL DEFAULT 0,  #--0未完成， 1：完成
-        u_sError varchar(20000) NOT NULL DEFAULT '',
+        u_uStatus tinyint unsigned NOT NULL DEFAULT 0 COMMENT '0未完成， 1：完成',
+        u_uDetail varchar(10000) NOT NULL DEFAULT '',
+        u_sError varchar(10000) NOT NULL DEFAULT '',
         PRIMARY KEY (u_sVersion, u_sName)
       ) ENGINE=InnoDB DEFAULT CHARSET = utf8;`
-    )
+      )
+    }, options)
 
     let count = 0
     await theone.Db.transaction(async  db => {
@@ -117,41 +122,62 @@ class Upgrade {
 
       for (const [version, upgrade] of upgrades) {
         let set = new Set()
-        for (const [name, func, force] of upgrade) {
-          assert(!set.has(name), `[${dbName}]版本升级重名:${name}`)
-          set.add(name)
-          if (data[version] && data[version][name] == 1) continue//已经执行
-          if (data[version] && data[version][name] == 0 && !force) {
-            throw new Error(`[${dbName}]版本升级失败！！ 上次未完成的动作：${version}【${name}】需处理`)
+        for (const [name, funcs, force] of upgrade) {
+          if (typeof funcs == 'string') {
+            funcs = funcs.split(';').map(s => s.trim()).filter(s => s != '')
+            if (funcs.length == 1) funcs = funcs[0]
           }
-          await noTransDb.execute(
-            `REPLACE INTO ${tableName}(u_sVersion, u_sName) VALUES(?,?)`, [version, name]
-          )
-          try {
-            if (typeof func == 'string') {
-              await theone.Db.transaction(async  db => db.execute(func), options)
-            } else {
-              await theone.Db.transaction(async  db => func(db), options)
+          if (Array.isArray(funcs)) {
+            let old = name
+            for (let i = 0; i < funcs.length; i++) {
+              if (i > 0) name = `${old} [${i}]`   //为了允许末尾追加语句, 0号不加下标, (注: 只允许末尾追加) 
+              assert(!set.has(name), `[${dbName}]版本升级重名:${name}`)
+              set.add(name)
+              if (data[version] && data[version][name] == 1) continue//已经执行
+              await this.doUpgrade(tableName, version, options, name, funcs[i])
             }
-          } catch (e) {
-            await noTransDb.execute(
-              `UPDATE ${tableName} SET u_sError = ? WHERE u_sVersion =? AND u_sName = ?`,
-              [e.toString(), version, name]
-            )
-            throw e
+          } else {
+            assert(!set.has(name), `[${dbName}]版本升级重名:${name}`)
+            set.add(name)
+            if (data[version] && data[version][name] == 1) continue//已经执行
+            await this.doUpgrade(tableName, version, options, name, funcs)
           }
-          await noTransDb.execute(
-            `UPDATE ${tableName} SET u_uStatus = 1, u_sError = "" WHERE u_sVersion =? AND u_sName = ?`,
-            [version, name]
-          )
           count++
         }
       }
-    }, options).finally(() => {
-      noTransDb.release()
-    })
+    }, options)
     theone.log.info(`[${dbName}]版本升级完成！！`)
     return count
+  }
+
+  async doUpgrade(tableName, version, options, name, func) {
+    await theone.Db.transaction(async (db) => {
+      await db.execute(
+        `REPLACE INTO ${tableName}(u_sVersion, u_sName, u_uDetail) VALUES(?,?,?)`, [version, name, func.toString()]
+      )
+    }, options)
+
+    try {
+      if (typeof func == 'string') {
+        await theone.Db.transaction(async  db => db.execute(func), options)
+      } else {
+        await theone.Db.transaction(async  db => func(db), options)
+      }
+    } catch (e) {
+      await theone.Db.transaction(async (db) => {
+        await db.execute(
+          `UPDATE ${tableName} SET u_sError = ? WHERE u_sVersion =? AND u_sName = ?`,
+          [e.toString(), version, name]
+        )
+      }, options)
+      throw new Error(`版本升级失败！！  ${version}【${name}】  msg:` + e.toString())
+    }
+    await theone.Db.transaction(async (db) => {
+      await db.execute(
+        `UPDATE ${tableName} SET u_uStatus = 1, u_sError = "" WHERE u_sVersion =? AND u_sName = ?`,
+        [version, name]
+      )
+    }, options)
   }
 }
 
