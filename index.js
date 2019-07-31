@@ -122,7 +122,7 @@ class Upgrade {
 
       for (const [version, upgrade] of upgrades) {
         let set = new Set()
-        for (const [name, funcs, force] of upgrade) {
+        for (let [name, funcs] of upgrade) {
           if (typeof funcs == 'string') {
             funcs = funcs.split(';').map(s => s.trim()).filter(s => s != '')
             if (funcs.length == 1) funcs = funcs[0]
