@@ -117,12 +117,13 @@ class Upgrade {
       for (const row of rt) {
         let v = row.u_sVersion
         if (!data[v]) data[v] = {}
-        data[v][row.u_sName] = row.u_uStatus
+        data[v][row.u_sName.trim()] = row.u_uStatus
       }
 
       for (const [version, upgrade] of upgrades) {
         let set = new Set()
         for (let [name, funcs] of upgrade) {
+          name = name.trim()
           if (typeof funcs == 'string') {
             funcs = funcs.split(';').map(s => s.trim()).filter(s => s != '')
             if (funcs.length == 1) funcs = funcs[0]
