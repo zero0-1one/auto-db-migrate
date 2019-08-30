@@ -93,14 +93,16 @@ class Upgrade {
     await theone.Db.transaction(async  db => {
       await db.execute(
         `CREATE TABLE IF NOT EXISTS ${tableName} (
-        u_sVersion varchar(255) NOT NULL,
-        u_sName varchar(255) NOT NULL,
-        u_dtTime datetime NOT NULL DEFAULT NOW(),
-        u_uStatus tinyint unsigned NOT NULL DEFAULT 0 COMMENT '0未完成， 1：完成',
-        u_uDetail varchar(10000) NOT NULL DEFAULT '',
-        u_sError varchar(10000) NOT NULL DEFAULT '',
-        PRIMARY KEY (u_sVersion, u_sName)
-      ) ENGINE=InnoDB DEFAULT CHARSET = utf8;`
+          u_uId bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+          u_sVersion varchar(255) NOT NULL,
+          u_sName varchar(255) NOT NULL,
+          u_dtTime datetime NOT NULL DEFAULT NOW(),
+          u_uStatus tinyint unsigned NOT NULL DEFAULT 0 COMMENT '0未完成， 1：完成',
+          u_uDetail varchar(10000) NOT NULL DEFAULT '',
+          u_sError varchar(10000) NOT NULL DEFAULT '',
+          PRIMARY KEY (u_uId),
+          UNIQUE KEY (u_sVersion, u_sName)
+        ) ENGINE=InnoDB DEFAULT CHARSET = utf8;`
       )
     }, options)
 
