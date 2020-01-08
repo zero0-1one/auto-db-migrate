@@ -6,7 +6,9 @@ const assert = require('assert')
 const requireAll = require('require-all')
 const compareVersions = require('compare-versions')
 
-
+/**
+ * 目前只支持 mysql 隔离等级 READ-COMMITTED 
+ */
 class Upgrade {
   constructor(theone) {
     this.theone = theone
@@ -63,7 +65,7 @@ class Upgrade {
 
       for (const fileName in group) {
         let contents = group[fileName].map(tableName => {
-          if (!structs[tableName]) theone.warn(`[${dbName}]数据库不存在 table:${tableName}`)
+          if (!structs[tableName]) theone.log.warn(`[${dbName}]数据库不存在 table:${tableName}`)
           return structs[tableName] || ''
         }).join(';\n\n\n')
         let filePath = path.join(dir, prefix + fileName + '.sql')
