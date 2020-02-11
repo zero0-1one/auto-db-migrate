@@ -52,11 +52,11 @@ class Upgrade {
     let options = theone.config.databaseMap[dbName]
     let colName = 'Tables_in_' + options.database
     await theone.Db.transaction(async  db => {
-      let tables = await db.execute('SHOW TABLES')
+      let tables = await db.query('SHOW TABLES')
       let structs = {}
       for (const row of tables) {
         let tableName = row[colName]
-        let createSql = (await db.executeOne(
+        let createSql = (await db.queryOne(
           'SHOW CREATE TABLE ' + tableName
         ))['Create Table']
         structs[tableName] = this.filterCreateSql(createSql)
@@ -93,7 +93,7 @@ class Upgrade {
     let options = theone.config.databaseMap[dbName]
 
     await theone.Db.transaction(async  db => {
-      await db.execute(
+      await db.query(
         `CREATE TABLE IF NOT EXISTS ${tableName} (
           u_uId bigint(20) unsigned NOT NULL AUTO_INCREMENT,
           u_sVersion varchar(255) NOT NULL,
@@ -106,15 +106,21 @@ class Upgrade {
           UNIQUE KEY (u_sVersion, u_sName)
         ) ENGINE=InnoDB DEFAULT CHARSET = utf8;`
       )
+      await db.query(
+        `CREATE TABLE IF NOT EXISTS ${tableName + '_lock'} (
+          ul_uId int unsigned NOT NULL,
+          PRIMARY KEY (ul_uId)
+        ) ENGINE=InnoDB`
+      )
     }, options)
 
     let count = 0
     await theone.Db.transaction(async  db => {
       //加锁 防止多进程部署时候同时执行
-      await db.execute(
-        `REPLACE INTO ${tableName}(u_sVersion, u_sName) VALUES(?,?)`, ['0', 'init']
+      await db.query(
+        `REPLACE INTO ${tableName + '_lock'}(ul_uId) VALUES(?)`, [1]
       )
-      let rt = await db.execute(
+      let rt = await db.query(
         `SELECT u_sVersion, u_sName, u_uStatus FROM ${tableName}`
       )
       let data = {}
@@ -157,6 +163,7 @@ class Upgrade {
 
   async doUpgrade(tableName, version, options, name, func) {
     await theone.Db.transaction(async (db) => {
+      console.log(func.toString())
       await db.execute(
         `REPLACE INTO ${tableName}(u_sVersion, u_sName, u_uDetail) VALUES(?,?,?)`, [version, name, func.toString()]
       )
@@ -164,13 +171,23 @@ class Upgrade {
 
     try {
       if (typeof func == 'string') {
-        await theone.Db.transaction(async  db => db.execute(func), options)
+        await theone.Db.transaction(async  db => db.query(func), options)
       } else {
-        await theone.Db.transaction(async  db => func(db), options)
+        await theone.Db.transaction(async  db => {
+          db.execute = (async function (...args) {
+            theone.log.warn(`不建议在 upgrade 中使用 execute 与 executeOne 方法, 已经为你切换为 query  :${name}`)
+            return db.query(...args)
+          })
+          db.executeOne = async function (...args) {
+            theone.log.warn(`不建议在 upgrade 中使用 execute 与 executeOne 方法, 已经为你切换为 queryOne  :${name}`)
+            return db.queryOne(...args)
+          }
+          await func(db)
+        }, options)
       }
     } catch (e) {
       await theone.Db.transaction(async (db) => {
-        await db.execute(
+        await db.query(
           `UPDATE ${tableName} SET u_sError = ? WHERE u_sVersion =? AND u_sName = ?`,
           [e.toString(), version, name]
         )
@@ -178,7 +195,7 @@ class Upgrade {
       throw new Error(`版本升级失败！！  ${version}【${name}】  msg:` + e.toString())
     }
     await theone.Db.transaction(async (db) => {
-      await db.execute(
+      await db.query(
         `UPDATE ${tableName} SET u_uStatus = 1, u_sError = "" WHERE u_sVersion =? AND u_sName = ?`,
         [version, name]
       )
@@ -189,4 +206,3 @@ class Upgrade {
 module.exports = function (theone) {
   return new Upgrade(theone)
 }
-
