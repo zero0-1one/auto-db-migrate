@@ -163,7 +163,6 @@ class Upgrade {
 
   async doUpgrade(tableName, version, options, name, func) {
     await theone.Db.transaction(async (db) => {
-      console.log(func.toString())
       await db.execute(
         `REPLACE INTO ${tableName}(u_sVersion, u_sName, u_uDetail) VALUES(?,?,?)`, [version, name, func.toString()]
       )
