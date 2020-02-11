@@ -1,6 +1,6 @@
 {
   "name": "zo-theone-upgrade",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Version management tool for theone framework",
   "main": "index.js",
   "scripts": {},
