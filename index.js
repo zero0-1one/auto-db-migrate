@@ -68,6 +68,7 @@ class Upgrade {
           if (!structs[tableName]) theone.log.warn(`[${dbName}]数据库不存在 table:${tableName}`)
           return structs[tableName] || ''
         }).join(';\n\n\n')
+        if (prefix && !prefix.endsWith('_')) prefix = prefix + '_'
         let filePath = path.join(dir, prefix + fileName + '.sql')
         if (contents) {
           fs.writeFileSync(filePath, contents + ';')
@@ -82,7 +83,8 @@ class Upgrade {
   async upgrade(dbName, dir, prefix = 'theone', beginVersion = '') {
     let theone = this.theone
     theone.log.info(`[${dbName}]版本升级中。。。`)
-    let tableName = prefix + '_upgrade'
+    if (prefix && !prefix.endsWith('_')) prefix = prefix + '_'
+    let tableName = prefix + 'upgrade'
     let all = requireAll(dir)
     let upgrades = []
     for (const version in all) {
