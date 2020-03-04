@@ -27,6 +27,21 @@ class Upgrade {
     return sql
   }
 
+  //检查每个字段 必须未 NOT NULL  或者明确指定 DEFAULT NULL
+  checkNotNull(createSql) {
+    let rows = createSql.split('\n')
+    let warnRows = []
+    for (let i = 1; i < rows.length - 1; i++) {
+      if (!(rows[i].includes('NOT NULL')
+        || rows[i].includes('DEFAULT NULL')
+        || rows[i].includes('KEY')
+      )) {
+        warnRows.push(rows[i])
+      }
+    }
+    return warnRows
+  }
+
   /**
    * group 定义表接口分类和顺序
    * 如：{
@@ -59,6 +74,10 @@ class Upgrade {
         let createSql = (await db.queryOne(
           'SHOW CREATE TABLE ' + tableName
         ))['Create Table']
+        let warnRows = this.checkNotNull(createSql)
+        for (const warnRow of warnRows) {
+          theone.log.warn('没有指定 NOT NULL 的字段: ' + warnRow)
+        }
         structs[tableName] = this.filterCreateSql(createSql)
         if (!groupTables.has(tableName)) group.struct.push(tableName)
       }
