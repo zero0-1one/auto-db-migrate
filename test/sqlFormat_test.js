@@ -1,0 +1,216 @@
+const util = require('../lib/util')
+const sqlFormat = require('../lib/sqlFormat')
+const { expect } = require('chai').use(require('chai-like'))
+
+
+
+describe('sqlFormat 测试', function () {
+  describe('createRules()', function () {
+    it('createRules', function () {
+      let rules = sqlFormat.createRules(['useNow', 'noSpaceInBracket'])
+      expect(rules).to.be.deep.equal([
+        ...sqlFormat.rules['useNow'],
+        ...sqlFormat.rules['noSpaceInBracket'],
+      ])
+    })
+
+    it('createRules 递归', function () {
+      let rules = sqlFormat.createRules(['useNow', 'noSpaceWrapBracket'])
+      expect(rules).to.be.deep.equal([
+        ...sqlFormat.rules['useNow'],
+        ...sqlFormat.rules['noSpaceBeforeBracket'],
+        ...sqlFormat.rules['noSpaceAfterBracket'],
+      ])
+    })
+
+    it('createRules 自定义', function () {
+      let rules = sqlFormat.createRules([[/\bCURRENT_TIMESTAMP\b/gi, 'NOW()', 'out']])
+      expect(rules).to.be.deep.equal([[/\bCURRENT_TIMESTAMP\b/gi, 'NOW()', 'out']])
+    })
+
+    it('createRules 循环检测', function () {
+      for (const name in sqlFormat.rules) {
+        expect(() => sqlFormat.createRules([name])).to.not.throw()
+      }
+    })
+  })
+
+  describe('format()', function () {
+    let testData = [{
+      rule: ['indent0'],
+      sql: 'line1\n line2\n   line3',
+      exp: 'line1\nline2\nline3'
+    }, {
+      rule: ['indent2'],
+      sql: 'line1\n line2\n   line3',
+      exp: 'line1\n  line2\n  line3'
+    }, {
+      rule: ['indent4'],
+      sql: 'line1\n line2\n   line3',
+      exp: 'line1\n    line2\n    line3'
+    }, {
+      rule: ['referencesOrder'],
+      sql: 'ON UPDATE CASCADE ON DELETE CASCADE',
+      exp: 'ON DELETE CASCADE ON UPDATE CASCADE'
+    }, {
+      rule: ['referencesOrder'],
+      sql: 'ON UPDATE SET DEFAULT ON DELETE CASCADE',
+      exp: 'ON DELETE CASCADE ON UPDATE SET DEFAULT'
+    }, {
+      rule: ['useNow'],
+      sql: '`g_dtTime` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+      exp: '`g_dtTime` datetime DEFAULT NOW() ON UPDATE NOW()'
+    }, {
+      rule: ['useCurrent'],
+      sql: 'g_dtTime datetime DEFAULT NOW() ON UPDATE NOW()',
+      exp: 'g_dtTime datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'
+    }, {
+      rule: ['useKEY'],
+      sql: 'UNIQUE INDEX(abc)',
+      exp: 'UNIQUE KEY(abc)'
+    }, {
+      rule: ['useINDEX'],
+      sql: 'UNIQUE KEY (abc)',
+      exp: 'UNIQUE INDEX (abc)'
+    }, {
+      rule: ['noKeyName'],
+      sql: 'UNIQUE KEY `abc` (abc)',
+      exp: 'UNIQUE KEY (abc)'
+    }, {
+      rule: ['noKeyName'],
+      sql: 'CONSTRAINT \`table_a_ibfk_1\` FOREIGN KEY (\`id\`) REFERENCES table_b (id) ON DELETE CASCADE ON UPDATE CASCADE',
+      exp: 'FOREIGN KEY (\`id\`) REFERENCES table_b (id) ON DELETE CASCADE ON UPDATE CASCADE',
+    }, {
+      rule: ['noIndexName'],
+      sql: 'UNIQUE KEY abc(abc)',
+      exp: 'UNIQUE KEY(abc)'
+    }, {
+      rule: ['noIntLen'],
+      sql: '`abc` tinyint(3) unsigned NOT NULL,',
+      exp: '`abc` tinyint unsigned NOT NULL,'
+    }, {
+      rule: ['noIntLen', 'noBackQuote'],
+      sql: '`abc` int(10) NOT NULL,',
+      exp: 'abc int NOT NULL,'
+    }, {
+      rule: ['stringMultiLine'],
+      sql: `abc int NOT NULL COMMENT 'line1\\nline2\nline3',`,
+      exp: `abc int NOT NULL COMMENT 'line1\nline2\nline3',`
+    }, {
+      rule: ['stringInLine'],
+      sql: `abc int NOT NULL COMMENT 'line1\\nline2\nline3',`,
+      exp: `abc int NOT NULL COMMENT 'line1\\nline2\\nline3',`
+    }, {
+      rule: ['noBackQuote'],
+      sql: '`abc` int(10) NOT NULL,',
+      exp: 'abc int(10) NOT NULL,'
+    }, {
+      rule: ['noSpaceInBracket'],
+      sql: 'abc int( 10 ) NOT NULL,',
+      exp: 'abc int(10) NOT NULL,'
+    }, {
+      rule: ['noSpaceBeforeBracket'],
+      sql: 'abc int (10) NOT NULL,',
+      exp: 'abc int(10) NOT NULL,'
+    }, {
+      rule: ['noSpaceAfterBracket'],
+      sql: 'abc int (10) NOT NULL,',
+      exp: 'abc int (10)NOT NULL,'
+    }, {
+      rule: ['spaceBeforeBracket'],
+      sql: 'abc int(10) NOT NULL,',
+      exp: 'abc int (10) NOT NULL,'
+    }, {
+      rule: ['spaceAfterBracket'],
+      sql: 'abc int(10)NOT NULL,',
+      exp: 'abc int(10) NOT NULL,'
+    }, {
+      rule: ['noSpaceWrapBracket'],
+      sql: 'abc int (10) NOT NULL,',
+      exp: 'abc int(10)NOT NULL,'
+    }, {
+      rule: ['spaceWrapBracket'],
+      sql: 'abc int(10)NOT NULL,',
+      exp: 'abc int (10) NOT NULL,'
+    }, {
+      rule: ['noSpaceAfterBracket'],
+      sql: 'abc int (10) NOT NULL,',
+      exp: 'abc int (10)NOT NULL,'
+    }, {
+      rule: ['noSpaceWrapEqual'],
+      sql: 'ENGINE = InnoDB DEFAULT CHARSET= utf8;',
+      exp: 'ENGINE=InnoDB DEFAULT CHARSET=utf8;'
+    }, {
+      rule: ['noTableDefault_utf8'],
+      sql: 'ENGINE=InnoDB AUTO_INCREMENT=24557 DEFAULT CHARSET=utf8',
+      exp: 'ENGINE=InnoDB AUTO_INCREMENT=24557',
+    }, {
+      rule: ['noTableDefault_utf8mb4'],
+      sql: 'ENGINE=InnoDB AUTO_INCREMENT=24557 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci',
+      exp: 'ENGINE=InnoDB AUTO_INCREMENT=24557'
+    }, {
+      rule: ['noAutoIncrement'],
+      sql: 'ENGINE=InnoDB AUTO_INCREMENT=24557 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci',
+      exp: 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci'
+    }, {
+      rule: ['intValueNoQuote'],
+      sql: `abc tinyint(3) unsigned NOT NULL DEFAULT '0',`,
+      exp: 'abc tinyint(3) unsigned NOT NULL DEFAULT 0,'
+    }, {
+      rule: ['uppercase'],
+      sql: `abc char(13) not null default 'default',`,
+      exp: `abc char(13) NOT NULL DEFAULT 'default',`
+    }, {
+      rule: ['noForeignAutoKey', 'indent2'],
+      sql: 'CREATE TABLE table_a (\n'
+        + '  id bigint(20) unsigned NOT NULL,\n'
+        + '  value varchar(255) NOT NULL,\n'
+        + '  KEY(id),\n'
+        + '  CONSTRAINT \`table_a_ibfk_1\` FOREIGN KEY (\`id\`) REFERENCES table_b (id) ON DELETE CASCADE ON UPDATE CASCADE\n'
+        + ') ENGINE = InnoDB DEFAULT CHARSET = utf8; ',
+      exp: 'CREATE TABLE table_a (\n'
+        + '  id bigint(20) unsigned NOT NULL,\n'
+        + '  value varchar(255) NOT NULL,\n'
+        + '  CONSTRAINT \`table_a_ibfk_1\` FOREIGN KEY (\`id\`) REFERENCES table_b (id) ON DELETE CASCADE ON UPDATE CASCADE\n'
+        + ') ENGINE = InnoDB DEFAULT CHARSET = utf8;',
+    }, {
+      rule: ['simple'],
+      sql: 'CREATE TABLE table_a (\n'
+        + '  id bigint(20) unsigned NOT NULL,\n'
+        + '  value varchar (255) NOT NULL,\n'
+        + '  KEY(id),\n'
+        + '  CONSTRAINT \`table_a_ibfk_1\` FOREIGN KEY (\`id\`) references table_b (id)  ON UPDATE CASCADE ON DELETE CASCADE\n'
+        + ') ENGINE = InnoDB DEFAULT CHARSET = utf8; ',
+      exp: 'CREATE TABLE table_a (\n'
+        + '  id bigint unsigned NOT NULL,\n'
+        + '  value varchar(255) NOT NULL,\n'
+        + '  FOREIGN KEY (id) REFERENCES table_b (id) ON DELETE CASCADE ON UPDATE CASCADE\n'
+        + ') ENGINE=InnoDB DEFAULT CHARSET=utf8;',
+    },
+    {
+      rule: ['compact'],
+      sql: 'CREATE TABLE `table_a` (\n'
+        + '  id bigint(20) unsigned NOT NULL,\n'
+        + '  value varchar (255) NOT NULL,\n'
+        + '  KEY(id),\n'
+        + '  CONSTRAINT \`table_a_ibfk_1\` FOREIGN KEY (\`id\`) references table_b ( `id`)  ON UPDATE CASCADE ON DELETE CASCADE\n'
+        + ') ENGINE = InnoDB DEFAULT CHARSET = utf8; ',
+      exp: 'CREATE TABLE`table_a`('
+        + 'id bigint(20)unsigned NOT NULL,'
+        + 'value varchar(255)NOT NULL,'
+        + 'KEY(id),'
+        + 'CONSTRAINT\`table_a_ibfk_1\`FOREIGN KEY(`id`)REFERENCES table_b(`id`)ON DELETE CASCADE ON UPDATE CASCADE'
+        + ')ENGINE=InnoDB DEFAULT CHARSET=utf8;',
+    },
+    ]
+    testData.forEach(({ rule, sql, exp }, i) => {
+      it(`[${i}]` + rule.join(), function () {
+        let format = sqlFormat.format(sql, sqlFormat.createRules(rule))
+        if(format != exp){
+          console.log(format.length, exp.length)
+        }
+        expect(format).to.be.equal(exp)
+      })
+    })
+  })
+})
