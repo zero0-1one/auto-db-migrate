@@ -3,7 +3,6 @@ const sqlFormat = require('../lib/sqlFormat')
 const { expect } = require('chai').use(require('chai-like'))
 
 
-
 describe('sqlFormat 测试', function () {
   describe('createRules()', function () {
     it('createRules', function () {
@@ -238,6 +237,7 @@ describe('sqlFormat 测试', function () {
         let format = sqlFormat.format(sql, rule)
         if (format != exp) {
           console.log(format.length, exp.length)
+          sqlFormat.format(sql, rule)
         }
         expect(format).to.be.equal(exp)
       })

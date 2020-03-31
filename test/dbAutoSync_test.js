@@ -1,10 +1,28 @@
 const autoSync = require('../lib/dbAutoSync')
 const { expect } = require('chai').use(require('chai-like'))
 const path = require('path')
-const dbTools = require('./dbTools')
-let { db, tempDb } = dbTools
+const dbTools = require('../lib/dbTools')
+const util = require('../lib/util')
 
-autoSync._test_ = 'This is dangerous!! setting this sentence will clear all data in the database.'
+
+const options = {
+  'host': 'localhost',
+  'user': 'root',
+  'password': '1',
+  'database': '__temp_sync__a',
+}
+
+const tempOptions = {
+  'host': 'localhost',
+  'user': 'root',
+  'password': '1',
+  'database': '__temp_sync__b',
+}
+// 初始化数据库
+// CREATE DATABASE IF NOT EXISTS `__temp_sync__a`;  CREATE DATABASE IF NOT EXISTS `__temp_sync__b`;
+//
+dbTools.init(options, tempOptions)
+let { db, tempDb } = dbTools
 
 async function createMigration(current, target) {
   if (current) {
@@ -56,10 +74,14 @@ describe('dbAutoSync 测试', function () {
     let diff = await autoSync.dataBaseDiff(db, tempDb)
     expect(diff).to.be.deep.like({ delTables: {}, diffTables: [] })
     expect(diff.addTables).to.have.all.keys(['table_a', 'table_b', 'table_c'])
+    expect(diff.sameTables).to.be.deep.equal({})
+    expect(diff.delTables).to.be.deep.equal({})
 
     diff = await autoSync.dataBaseDiff(tempDb, db)
     expect(diff).to.be.like({ addTables: {}, diffTables: [] })
     expect(diff.delTables).to.have.all.keys(['table_a', 'table_b', 'table_c'])
+    expect(diff.sameTables).to.be.deep.equal({})
+    expect(diff.addTables).to.be.deep.equal({})
   })
 
   describe('createMigration change table', function () {
@@ -72,7 +94,7 @@ describe('dbAutoSync 测试', function () {
         down: [],
       })
     })
-return
+
     it('createMigration add table', async function () {
       let migration = await createMigration('', 'base')
       let createTables = await autoSync.getCreateTables(tempDb)
@@ -111,7 +133,9 @@ return
 
 
   //最后释放
-  it('release db', async function () {
-    await dbTools.close()
+  describe('释放db', function () {
+    it('release db', async function () {
+      await dbTools.close()
+    })
   })
 })
