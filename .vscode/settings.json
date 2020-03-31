@@ -1,0 +1,13 @@
+{
+  "cSpell.words": [
+    "antlr",
+    "simi"
+  ],
+  "antlr4.generation": {
+    "mode": "external",
+    "outputDir":"../js",
+    "language": "JavaScript",
+    "listeners": true,
+    "visitors": true
+  }
+}

@@ -4,6 +4,46 @@ const { expect } = require('chai').use(require('chai-like'))
 
 
 describe('util 测试', function () {
+  it('removeComment 无注释', function () {
+    let string = 'line1\n*line2\nline3"#not comment"'
+    let newString = util.removeComment(string)
+    expect(newString).to.be.equal(string)
+  })
+
+  it('removeComment 单行', function () {
+    let string = 'line1\n#comment1\nline3#comment2\nline4//comment3  '
+    let newString = util.removeComment(string)
+    expect(newString).to.be.equal('line1\n\nline3\nline4')
+
+
+    string = 'line1\n#comment1\nline3"#comment2"\nline4//comment3  '
+    newString = util.removeComment(string)
+    expect(newString).to.be.equal('line1\n\nline3"#comment2"\nline4')
+  })
+
+  it('removeComment 多行', function () {
+    let string = 'line1\n/*comment1  #line2\nline3*/line3.2\nline4'
+    let newString = util.removeComment(string)
+    expect(newString).to.be.equal('line1\nline3.2\nline4')
+
+    string = 'line1\n"/*comment1"#line2\nline3*/line3.2\nline4'
+    newString = util.removeComment(string)
+    expect(newString).to.be.equal('line1\n"/*comment1"\nline3*/line3.2\nline4')
+  })
+
+
+  it('removeComment  outComment', function () {
+    let outComment = []
+    let string = 'line1\n/*comment1  #line2\nline3*/line3.2\nline4'
+    let newString = util.removeComment(string, undefined, outComment)
+    expect(newString).to.be.equal('line1\nline3.2\nline4')
+    expect(outComment).to.be.deep.equal([{ str: '/*comment1  #line2\nline3*/', start: 6, end: 32 }])
+
+    string = 'line1\n"/*comment1"#line2\nline3*/line3.2\nline4'
+    newString = util.removeComment(string)
+    expect(newString).to.be.equal('line1\n"/*comment1"\nline3*/line3.2\nline4')
+  })
+
   it('splitByQuotes 普通', function () {
     let string = 'out1\'s1\'out2`s2`out3'
     let items = util.splitByQuote(string)
@@ -80,5 +120,24 @@ describe('util 测试', function () {
     expect(newString).to.be.deep.equal('[out1,out2][`in1,in2`][out3,out4,]')
   })
 
+
+  it('findEnclosedString', function () {
+    let string = 'out1(in1)out2(in2(in3)in4)'
+    let strings = util.findEnclosedString(string, '()', 1).map(s => s.str)
+    expect(strings).to.be.deep.equal(['in1'])
+
+    strings = util.findEnclosedString(string, '()', 2).map(s => s.str)
+    expect(strings).to.be.deep.equal(['in1', 'in2(in3)in4'])
+  })
+
+
+  it('findByQuote', function () {
+    let string = 'a-1 a-2 `a-3` a4 ab-5 a-11 \'a-2\''
+    let results = util.findByQuote(string, /\b\w-(\d+)/, { type: 'out' })
+    expect(results).to.be.deep.equal([['a-1', '1'], ['a-11', '11']])
+
+    results = util.findByQuote(string, /\b\w-(\d+)/g, { type: 'out' })
+    expect(results).to.be.deep.equal([['a-1', '1'], ['a-2', '2'], ['a-11', '11']])
+  })
 
 })

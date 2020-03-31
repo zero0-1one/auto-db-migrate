@@ -1,0 +1,20 @@
+
+CREATE TABLE `b1` (
+  `b1_id` int(20) NOT NULL AUTO_INCREMENT,
+  `b1_value` int(11) NOT NULL,
+  PRIMARY KEY (`b1_id`),
+  KEY(`b1_value`),
+  CONSTRAINT `b1_ibfk_1` FOREIGN KEY (`b1_id`) REFERENCES `table` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+CREATE TABLE `b2` (
+  `b2_id` int(20) NOT NULL AUTO_INCREMENT,
+  `b2_value` int(11) NOT NULL,
+  PRIMARY KEY (`b2_id`),
+  KEY(`b2_value`),
+  CONSTRAINT `b2_ibfk_1` FOREIGN KEY (`b2_id`) REFERENCES `table` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+

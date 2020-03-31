@@ -1,0 +1,28 @@
+
+CREATE TABLE `a1` (
+  `a1_id` int(20) NOT NULL AUTO_INCREMENT,
+  `a1_value` int(11) NOT NULL,
+  PRIMARY KEY (`a1_id`),
+  KEY(`a1_value`),
+  CONSTRAINT `a1_ibfk_1` FOREIGN KEY (`a1_id`) REFERENCES `table` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+CREATE TABLE `a2` (
+  `a2_id` int(20) NOT NULL AUTO_INCREMENT,
+  `a2_value` int(11) NOT NULL,
+  PRIMARY KEY (`a2_id`),
+  KEY(`a2_value`),
+  CONSTRAINT `a2_ibfk_1` FOREIGN KEY (`a2_id`) REFERENCES `table` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+CREATE TABLE `a3` (
+  `a3_id` int(20) NOT NULL AUTO_INCREMENT,
+  `a3_value` int(11) NOT NULL,
+  PRIMARY KEY (`a3_id`),
+  KEY(`a3_value`),
+  CONSTRAINT `a3_ibfk_1` FOREIGN KEY (`a3_id`) REFERENCES `table` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

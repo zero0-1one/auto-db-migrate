@@ -7,19 +7,19 @@ const { expect } = require('chai').use(require('chai-like'))
 describe('sqlFormat 测试', function () {
   describe('createRules()', function () {
     it('createRules', function () {
-      let rules = sqlFormat.createRules(['useNow', 'noSpaceInBracket'])
+      let rules = sqlFormat.createRules(['useNow', 'noSpaceInBrackets'])
       expect(rules).to.be.deep.equal([
         ...sqlFormat.rules['useNow'],
-        ...sqlFormat.rules['noSpaceInBracket'],
+        ...sqlFormat.rules['noSpaceInBrackets'],
       ])
     })
 
     it('createRules 递归', function () {
-      let rules = sqlFormat.createRules(['useNow', 'noSpaceWrapBracket'])
+      let rules = sqlFormat.createRules(['useNow', 'noSpaceWrapBrackets'])
       expect(rules).to.be.deep.equal([
         ...sqlFormat.rules['useNow'],
-        ...sqlFormat.rules['noSpaceBeforeBracket'],
-        ...sqlFormat.rules['noSpaceAfterBracket'],
+        ...sqlFormat.rules['noSpaceBeforeBrackets'],
+        ...sqlFormat.rules['noSpaceAfterBrackets'],
       ])
     })
 
@@ -35,6 +35,16 @@ describe('sqlFormat 测试', function () {
     })
   })
 
+  it('removeExtComment()', function () {
+    let sql = `
+    #aaaa
+    bbbb
+    //cccc
+    dddd
+    ee#ee
+  `
+  })
+
   describe('format()', function () {
     let testData = [{
       rule: ['indent0'],
@@ -48,6 +58,26 @@ describe('sqlFormat 测试', function () {
       rule: ['indent4'],
       sql: 'line1\n line2\n   line3',
       exp: 'line1\n    line2\n    line3'
+    }, {
+      rule: ['noSpaceLine'],
+      sql: 'line1;\n\nline2;\nline3',
+      exp: 'line1;line2;line3'
+    }, {
+      rule: ['spaceLine0'],
+      sql: 'line1;\n\nline2;\nline3',
+      exp: 'line1;\nline2;\nline3'
+    }, {
+      rule: ['spaceLine1'],
+      sql: 'line1;\n\nline2;\nline3',
+      exp: 'line1;\n\nline2;\n\nline3'
+    }, {
+      rule: ['spaceLine2'],
+      sql: 'line1;\n\nline2;\nline3',
+      exp: 'line1;\n\n\nline2;\n\n\nline3'
+    }, {
+      rule: ['spaceLine3'],
+      sql: 'line1;\n\nline2;\nline3',
+      exp: 'line1;\n\n\n\nline2;\n\n\n\nline3'
     }, {
       rule: ['referencesOrder'],
       sql: 'ON UPDATE CASCADE ON DELETE CASCADE',
@@ -65,11 +95,11 @@ describe('sqlFormat 测试', function () {
       sql: 'g_dtTime datetime DEFAULT NOW() ON UPDATE NOW()',
       exp: 'g_dtTime datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'
     }, {
-      rule: ['useKEY'],
+      rule: ['useKey'],
       sql: 'UNIQUE INDEX(abc)',
       exp: 'UNIQUE KEY(abc)'
     }, {
-      rule: ['useINDEX'],
+      rule: ['useIndex'],
       sql: 'UNIQUE KEY (abc)',
       exp: 'UNIQUE INDEX (abc)'
     }, {
@@ -105,35 +135,35 @@ describe('sqlFormat 测试', function () {
       sql: '`abc` int(10) NOT NULL,',
       exp: 'abc int(10) NOT NULL,'
     }, {
-      rule: ['noSpaceInBracket'],
+      rule: ['noSpaceInBrackets'],
       sql: 'abc int( 10 ) NOT NULL,',
       exp: 'abc int(10) NOT NULL,'
     }, {
-      rule: ['noSpaceBeforeBracket'],
+      rule: ['noSpaceBeforeBrackets'],
       sql: 'abc int (10) NOT NULL,',
       exp: 'abc int(10) NOT NULL,'
     }, {
-      rule: ['noSpaceAfterBracket'],
+      rule: ['noSpaceAfterBrackets'],
       sql: 'abc int (10) NOT NULL,',
       exp: 'abc int (10)NOT NULL,'
     }, {
-      rule: ['spaceBeforeBracket'],
+      rule: ['spaceBeforeBrackets'],
       sql: 'abc int(10) NOT NULL,',
       exp: 'abc int (10) NOT NULL,'
     }, {
-      rule: ['spaceAfterBracket'],
+      rule: ['spaceAfterBrackets'],
       sql: 'abc int(10)NOT NULL,',
       exp: 'abc int(10) NOT NULL,'
     }, {
-      rule: ['noSpaceWrapBracket'],
+      rule: ['noSpaceWrapBrackets'],
       sql: 'abc int (10) NOT NULL,',
       exp: 'abc int(10)NOT NULL,'
     }, {
-      rule: ['spaceWrapBracket'],
+      rule: ['spaceWrapBrackets'],
       sql: 'abc int(10)NOT NULL,',
       exp: 'abc int (10) NOT NULL,'
     }, {
-      rule: ['noSpaceAfterBracket'],
+      rule: ['noSpaceAfterBrackets'],
       sql: 'abc int (10) NOT NULL,',
       exp: 'abc int (10)NOT NULL,'
     }, {
@@ -199,14 +229,14 @@ describe('sqlFormat 测试', function () {
         + 'id bigint(20)unsigned NOT NULL,'
         + 'value varchar(255)NOT NULL,'
         + 'KEY(id),'
-        + 'CONSTRAINT\`table_a_ibfk_1\`FOREIGN KEY(`id`)REFERENCES table_b(`id`)ON DELETE CASCADE ON UPDATE CASCADE'
+        + 'CONSTRAINT\`table_a_ibfk_1\`FOREIGN KEY(`id`)references table_b(`id`)ON UPDATE CASCADE ON DELETE CASCADE'
         + ')ENGINE=InnoDB DEFAULT CHARSET=utf8;',
     },
     ]
     testData.forEach(({ rule, sql, exp }, i) => {
       it(`[${i}]` + rule.join(), function () {
-        let format = sqlFormat.format(sql, sqlFormat.createRules(rule))
-        if(format != exp){
+        let format = sqlFormat.format(sql, rule)
+        if (format != exp) {
           console.log(format.length, exp.length)
         }
         expect(format).to.be.equal(exp)
