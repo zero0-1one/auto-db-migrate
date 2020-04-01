@@ -10,11 +10,14 @@ describe('createSqlParser 测试', function () {
     let schema = createSqlParser.parseCreateSql(sql.trim())
     expect(schema).to.be.deep.like({
       tableName: 'd',
-      options: {},
+      options: {
+        'ENGINE': "InnoDB",
+        'DEFAULT CHARSET': "utf8"
+      },
       keys: {
-        'primaryKey': { type: 'primaryKey', name: 'primaryKey', columns: ['d_id'] },
-        'd_value': { type: 'key', name: 'd_value', columns: ['d_value'] },
-        'd_ibfk_1': { type: 'foreignKey', name: 'd_ibfk_1', columns: ['d_id'], tableName: 'table', refColumns: ['id'] },
+        'primaryKey': { type: 'primaryKey', name: 'primaryKey', columns: '`d_id`' },
+        'd_value': { type: 'key', name: 'd_value', columns: '`d_value`' },
+        'd_ibfk_1': { type: 'foreignKey', name: 'd_ibfk_1', columns: '`d_id`', tableName: 'table', refColumns: '`id`' },
       },
       columns: {
         'd_id': { name: 'd_id', pos: 0, pre: null, next: { name: 'd_value' } },

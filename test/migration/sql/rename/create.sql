@@ -16,7 +16,8 @@ CREATE TABLE table_c2 (
 
 CREATE TABLE table_a (
   a_id int NOT NULL AUTO_INCREMENT,
-  a_value int NOT NULL,
+  a_value1 char(12) NOT NULL DEFAULT '',
+  a_value2 int NOT NULL,
   PRIMARY KEY (a_id),
-  KEY(a_value)
+  KEY(a_value2)
 ) ENGINE=InnoDB;

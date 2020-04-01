@@ -15,7 +15,8 @@
         "--timeout",
         "999999",
         "--colors",
-        "${workspaceFolder}/test"
+        "${workspaceFolder}/test",
+        // "${workspaceFolder}/test/dbAutoSync_test"
       ],
       "internalConsoleOptions": "openOnSessionStart",
       "skipFiles": [

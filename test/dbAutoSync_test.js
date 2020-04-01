@@ -72,13 +72,13 @@ describe('dbAutoSync 测试', function () {
     await autoSync.clearTempDataBase(db)
     await autoSync.initTempDbByDir(tempDb, path.join(__dirname, 'migration/sql/base'))
     let diff = await autoSync.dataBaseDiff(db, tempDb)
-    expect(diff).to.be.deep.like({ delTables: {}, diffTables: [] })
+    expect(diff).to.be.deep.like({ delTables: {}, changeTables: [] })
     expect(diff.addTables).to.have.all.keys(['table_a', 'table_b', 'table_c'])
     expect(diff.sameTables).to.be.deep.equal({})
     expect(diff.delTables).to.be.deep.equal({})
 
     diff = await autoSync.dataBaseDiff(tempDb, db)
-    expect(diff).to.be.like({ addTables: {}, diffTables: [] })
+    expect(diff).to.be.like({ addTables: {}, changeTables: [] })
     expect(diff.delTables).to.have.all.keys(['table_a', 'table_b', 'table_c'])
     expect(diff.sameTables).to.be.deep.equal({})
     expect(diff.addTables).to.be.deep.equal({})
@@ -124,8 +124,18 @@ describe('dbAutoSync 测试', function () {
     it('createMigration rename table', async function () {
       let migration = await createMigration('base', 'rename')
       expect(migration).to.be.deep.equal({
-        up: ['ALTER TABLE `table_c` RENAME TO `table_c2`'],
-        down: ['ALTER TABLE `table_c2` RENAME TO `table_c`'],
+        up: [
+          'ALTER TABLE `table_c` RENAME TO `table_c2`',
+          'ALTER TABLE `table_a` ADD COLUMN `a_value1` char(12) NOT NULL DEFAULT \'\' AFTER `a_id`',
+          'ALTER TABLE `table_a` CHANGE COLUMN `a_value` `a_value2` int(11) NOT NULL AFTER `a_value1`',
+          'ALTER TABLE `table_a` RENAME KEY `a_value` TO `a_value2`'
+        ],
+        down: [
+          'ALTER TABLE `table_c2` RENAME TO `table_c`',
+          'ALTER TABLE `table_a` DROP COLUMN `a_value1`',
+          'ALTER TABLE `table_a` CHANGE COLUMN `a_value2` `a_value` int(11) NOT NULL AFTER `a_id`',
+          'ALTER TABLE `table_a` RENAME KEY `a_value2` TO `a_value`',
+        ],
       })
     })
   })

@@ -2,7 +2,6 @@ const util = require('../lib/util')
 const sqlFormat = require('../lib/sqlFormat')
 const { expect } = require('chai').use(require('chai-like'))
 
-
 describe('sqlFormat 测试', function () {
   describe('createRules()', function () {
     it('createRules', function () {
