@@ -50,16 +50,16 @@ describe('migration 测试', function () {
     await migration.upgrade()
   })
 
-  it('format by dir', async function () {
-    let migration = new Migration({
-      db: options,
-      tempDb: tempOptions,
-      autoSync: true,
-      dir: path.join(__dirname, '../example'),
-      showLog: false
-    })
-    await migration.format()
-  })
+  // it('format by dir', async function () {
+    // let migration = new Migration({
+    //   db: options,
+    //   tempDb: tempOptions,
+    //   autoSync: true,
+    //   dir: path.join(__dirname, '../example'),
+    //   showLog: false
+    // })
+    // await migration.format()
+  // })
 
   it('format by db', async function () {
     let migration = new Migration({
@@ -68,7 +68,8 @@ describe('migration 测试', function () {
       autoSync: true,
       dir: path.join(__dirname, '../example'),
       showLog: false,
-      formatByDb: true
+      formatByDb: true,
+      formatRules: ['simple', 'noTableDefault_utf8mb4']
     })
     await migration.format()
   })
