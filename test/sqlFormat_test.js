@@ -168,11 +168,11 @@ describe('sqlFormat 测试', function () {
       sql: 'ENGINE = InnoDB DEFAULT CHARSET= utf8;',
       exp: 'ENGINE=InnoDB DEFAULT CHARSET=utf8;'
     }, {
-      rule: ['noTableDefault_utf8'],
+      rule: ['noTableCharset_utf8'],
       sql: 'ENGINE=InnoDB AUTO_INCREMENT=24557 DEFAULT CHARSET=utf8',
       exp: 'ENGINE=InnoDB AUTO_INCREMENT=24557',
     }, {
-      rule: ['noTableDefault_utf8mb4'],
+      rule: ['noTableCharset_utf8mb4'],
       sql: 'ENGINE=InnoDB AUTO_INCREMENT=24557 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci',
       exp: 'ENGINE=InnoDB AUTO_INCREMENT=24557'
     }, {
@@ -214,29 +214,10 @@ describe('sqlFormat 测试', function () {
         + '  FOREIGN KEY (id) REFERENCES table_b (id) ON DELETE CASCADE ON UPDATE CASCADE\n'
         + ') ENGINE=InnoDB DEFAULT CHARSET=utf8;',
     },
-    {
-      rule: ['compact'],
-      sql: 'CREATE TABLE `table_a` (\n'
-        + '  id bigint(20) unsigned NOT NULL,\n'
-        + '  value varchar (255) NOT NULL,\n'
-        + '  KEY(id),\n'
-        + '  CONSTRAINT \`table_a_ibfk_1\` FOREIGN KEY (\`id\`) references table_b ( `id`)  ON UPDATE CASCADE ON DELETE CASCADE\n'
-        + ') ENGINE = InnoDB DEFAULT CHARSET = utf8; ',
-      exp: 'CREATE TABLE`table_a`('
-        + 'id bigint(20)unsigned NOT NULL,'
-        + 'value varchar(255)NOT NULL,'
-        + 'KEY(id),'
-        + 'CONSTRAINT\`table_a_ibfk_1\`FOREIGN KEY(`id`)references table_b(`id`)ON UPDATE CASCADE ON DELETE CASCADE'
-        + ')ENGINE=InnoDB DEFAULT CHARSET=utf8;',
-    },
     ]
     testData.forEach(({ rule, sql, exp }, i) => {
       it(`[${i}]` + rule.join(), function () {
         let format = sqlFormat.format(sql, rule)
-        if (format != exp) {
-          console.log(format.length, exp.length)
-          sqlFormat.format(sql, rule)
-        }
         expect(format).to.be.equal(exp)
       })
     })

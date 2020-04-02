@@ -47,8 +47,8 @@ describe('autoSync 测试', function () {
   it('getTableGroup()', function () {
     let group = autoSync.getTableGroup(path.join(__dirname, 'sql'), 'test_')
     expect(group).to.be.deep.like({
-      a: { tables: ['a1', 'a2', 'a3'] },
-      b: { tables: ['b1', 'b2'] },
+      a: [{ tableName: 'a1' }, { tableName: 'a2' }, { tableName: 'a3' }],
+      b: [{ tableName: 'b1' }, { tableName: 'b2' }],
     })
   })
 
@@ -56,7 +56,8 @@ describe('autoSync 测试', function () {
     await autoSync.initTempDbByDir(tempDb, path.join(__dirname, 'sql/base'))
     let group = autoSync.getTableGroup(path.join(__dirname, 'sql/base'))
     let tables = await autoSync.getCreateTables(tempDb)
-    expect(Object.keys(tables).sort()).to.be.deep.equal(group.create.tables.sort())
+    let exp = group.create.map(v => v.tableName).sort()
+    expect(Object.keys(tables).sort()).to.be.deep.equal(exp)
 
     await autoSync.clearTempDataBase(tempDb)
     let tables2 = await autoSync.getCreateTables(tempDb)

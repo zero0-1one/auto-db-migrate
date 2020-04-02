@@ -51,14 +51,14 @@ describe('migration 测试', function () {
   })
 
   // it('format by dir', async function () {
-    // let migration = new Migration({
-    //   db: options,
-    //   tempDb: tempOptions,
-    //   autoSync: true,
-    //   dir: path.join(__dirname, '../example'),
-    //   showLog: false
-    // })
-    // await migration.format()
+  // let migration = new Migration({
+  //   db: options,
+  //   tempDb: tempOptions,
+  //   autoSync: true,
+  //   dir: path.join(__dirname, '../example'),
+  //   showLog: false
+  // })
+  // await migration.format()
   // })
 
   it('format by db', async function () {
@@ -69,7 +69,7 @@ describe('migration 测试', function () {
       dir: path.join(__dirname, '../example'),
       showLog: false,
       formatByDb: true,
-      formatRules: ['simple', 'noTableDefault_utf8mb4']
+      formatRules: ['simple', 'noTableCharset']
     })
     await migration.format()
   })

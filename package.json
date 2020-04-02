@@ -1,5 +1,5 @@
 {
-  "name": "db-auto-migrate",
+  "name": "db-migrate",
   "version": "1.0.0",
   "description": "Automatic database migration with 'CREATE TABLE' document.",
   "main": "index.js",
