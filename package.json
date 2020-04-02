@@ -1,5 +1,5 @@
 {
-  "name": "zo-db-migrate",
+  "name": "db-auto-migrate",
   "version": "1.0.0",
   "description": "Automatic database migration with 'CREATE TABLE' document.",
   "main": "index.js",
