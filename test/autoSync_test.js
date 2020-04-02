@@ -1,57 +1,62 @@
-const autoSync = require('../lib/dbAutoSync')
+const autoSync = require('../lib/autoSync')
 const { expect } = require('chai').use(require('chai-like'))
 const path = require('path')
-const dbTools = require('../lib/dbTools')
-const util = require('../lib/util')
-
+const Db = require('../lib/db')
+// const util = require('../lib/util')
 
 const options = {
   'host': 'localhost',
   'user': 'root',
   'password': '1',
-  'database': '__temp_sync__a',
+  'database': '__temp_sync__db',
 }
 
 const tempOptions = {
   'host': 'localhost',
   'user': 'root',
   'password': '1',
-  'database': '__temp_sync__b',
-}
-// 初始化数据库
-// CREATE DATABASE IF NOT EXISTS `__temp_sync__a`;  CREATE DATABASE IF NOT EXISTS `__temp_sync__b`;
-//
-dbTools.init(options, tempOptions)
-let { db, tempDb } = dbTools
-
-async function createMigration(current, target) {
-  if (current) {
-    await autoSync.initTempDbByDir(db, path.join(__dirname, 'migration/sql/' + current))
-  } else {
-    await autoSync.clearTempDataBase(db)
-  }
-  if (target) {
-    await autoSync.initTempDbByDir(tempDb, path.join(__dirname, 'migration/sql/' + target))
-  } else {
-    await autoSync.clearTempDataBase(tempDb)
-  }
-  return await autoSync.createMigration(db, tempDb)
+  'database': '__temp_sync__temp_db',
 }
 
-describe('dbAutoSync 测试', function () {
+
+
+describe('autoSync 测试', function () {
+  let db = null
+  let tempDb = null
+  async function createMigration(current, target) {
+    if (current) {
+      await autoSync.initTempDbByDir(db, path.join(__dirname, 'sql/' + current))
+    } else {
+      await autoSync.clearTempDataBase(db)
+    }
+    if (target) {
+      await autoSync.initTempDbByDir(tempDb, path.join(__dirname, 'sql/' + target))
+    } else {
+      await autoSync.clearTempDataBase(tempDb)
+    }
+    let { migration, succeed } = await autoSync.createMigration(db, tempDb)
+    if (!succeed) throw new Error()
+    return migration
+  }
+
+  it('init dbTools', function () {
+    db = new Db(options)
+    tempDb = new Db(tempOptions)
+  })
+
   it('getTableGroup()', function () {
     let group = autoSync.getTableGroup(path.join(__dirname, 'sql'), 'test_')
-    expect(group).to.be.deep.equal({
-      a: ['a1', 'a2', 'a3'],
-      b: ['b1', 'b2'],
+    expect(group).to.be.deep.like({
+      a: { tables: ['a1', 'a2', 'a3'] },
+      b: { tables: ['b1', 'b2'] },
     })
   })
 
   it('initTempDbByDir, clearTempDataBase, getCreateTables', async function () {
-    await autoSync.initTempDbByDir(tempDb, path.join(__dirname, 'migration/sql/base'))
-    let group = autoSync.getTableGroup(path.join(__dirname, 'migration/sql/base'))
+    await autoSync.initTempDbByDir(tempDb, path.join(__dirname, 'sql/base'))
+    let group = autoSync.getTableGroup(path.join(__dirname, 'sql/base'))
     let tables = await autoSync.getCreateTables(tempDb)
-    expect(Object.keys(tables).sort()).to.be.deep.equal(group.create.sort())
+    expect(Object.keys(tables).sort()).to.be.deep.equal(group.create.tables.sort())
 
     await autoSync.clearTempDataBase(tempDb)
     let tables2 = await autoSync.getCreateTables(tempDb)
@@ -59,9 +64,8 @@ describe('dbAutoSync 测试', function () {
   })
 
   it('getTablesSignByDb, cloneStructToTempDb', async function () {
-    await autoSync.initTempDbByDir(db, path.join(__dirname, 'migration/sql/base'))
+    await autoSync.initTempDbByDir(db, path.join(__dirname, 'sql/base'))
     let dbSign = await autoSync.getTablesSignByDb(db)
-
     await autoSync.cloneStructToTempDb(db, tempDb)
     let tempDbSign = await autoSync.getTablesSignByDb(tempDb)
 
@@ -70,26 +74,24 @@ describe('dbAutoSync 测试', function () {
 
   it('dataBaseDiff', async function () {
     await autoSync.clearTempDataBase(db)
-    await autoSync.initTempDbByDir(tempDb, path.join(__dirname, 'migration/sql/base'))
+    await autoSync.initTempDbByDir(tempDb, path.join(__dirname, 'sql/base'))
     let diff = await autoSync.dataBaseDiff(db, tempDb)
     expect(diff).to.be.deep.like({ delTables: {}, changeTables: [] })
     expect(diff.addTables).to.have.all.keys(['table_a', 'table_b', 'table_c'])
-    expect(diff.sameTables).to.be.deep.equal({})
     expect(diff.delTables).to.be.deep.equal({})
 
     diff = await autoSync.dataBaseDiff(tempDb, db)
     expect(diff).to.be.like({ addTables: {}, changeTables: [] })
     expect(diff.delTables).to.have.all.keys(['table_a', 'table_b', 'table_c'])
-    expect(diff.sameTables).to.be.deep.equal({})
     expect(diff.addTables).to.be.deep.equal({})
   })
 
   describe('createMigration change table', function () {
     it('createMigration same', async function () {
-      await autoSync.initTempDbByDir(db, path.join(__dirname, 'migration/sql/base'))
+      await autoSync.initTempDbByDir(db, path.join(__dirname, 'sql/base'))
       await autoSync.cloneStructToTempDb(db, tempDb)
-      let migration = await autoSync.createMigration(db, tempDb)
-      expect(migration).to.be.deep.equal({
+      let { migration } = await autoSync.createMigration(db, tempDb)
+      expect(migration).to.be.deep.like({
         up: [],
         down: [],
       })
@@ -123,9 +125,10 @@ describe('dbAutoSync 测试', function () {
 
     it('createMigration rename table', async function () {
       let migration = await createMigration('base', 'rename')
-      expect(migration).to.be.deep.equal({
+      expect(migration).to.be.deep.like({
         up: [
           'ALTER TABLE `table_c` RENAME TO `table_c2`',
+          'ALTER TABLE `table_a` MODIFY COLUMN `a_id` int(11) NOT NULL AUTO_INCREMENT FIRST',
           'ALTER TABLE `table_a` ADD COLUMN `a_value1` char(12) NOT NULL DEFAULT \'\' AFTER `a_id`',
           'ALTER TABLE `table_a` CHANGE COLUMN `a_value` `a_value2` int(11) NOT NULL AFTER `a_value1`',
           'ALTER TABLE `table_a` RENAME KEY `a_value` TO `a_value2`'
@@ -133,6 +136,7 @@ describe('dbAutoSync 测试', function () {
         down: [
           'ALTER TABLE `table_c2` RENAME TO `table_c`',
           'ALTER TABLE `table_a` DROP COLUMN `a_value1`',
+          'ALTER TABLE `table_a` MODIFY COLUMN `a_id` int(11) NOT NULL AUTO_INCREMENT FIRST',
           'ALTER TABLE `table_a` CHANGE COLUMN `a_value2` `a_value` int(11) NOT NULL AFTER `a_id`',
           'ALTER TABLE `table_a` RENAME KEY `a_value2` TO `a_value`',
         ],
@@ -145,7 +149,8 @@ describe('dbAutoSync 测试', function () {
   //最后释放
   describe('释放db', function () {
     it('release db', async function () {
-      await dbTools.close()
+      db.close()
+      tempDb.close()
     })
   })
 })

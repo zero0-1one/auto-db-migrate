@@ -1,4 +1,3 @@
-const util = require('../lib/util')
 const sqlFormat = require('../lib/sqlFormat')
 const { expect } = require('chai').use(require('chai-like'))
 
