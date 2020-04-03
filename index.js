@@ -1,1 +1,1 @@
-module.exports = require('./lib/upgrade')
+module.exports = require('./lib/migration')

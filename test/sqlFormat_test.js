@@ -44,10 +44,6 @@ describe('sqlFormat 测试', function () {
 
   describe('format()', function () {
     let testData = [{
-      rule: ['indent0'],
-      sql: 'line1\n line2\n   line3',
-      exp: 'line1\nline2\nline3'
-    }, {
       rule: ['indent2'],
       sql: 'line1\n line2\n   line3',
       exp: 'line1\n  line2\n  line3'

@@ -4,7 +4,7 @@
   "description": "Automatic database migration with 'CREATE TABLE' document.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=html --reporter=text mocha --timeout=10000 --slow=5000 test/autoUpgrade_test.js"
+    "test": "nyc --reporter=html --reporter=text mocha --timeout=10000 --slow=5000 test"
   },
   "keywords": [
     "database",
