@@ -27,7 +27,7 @@ module.exports = [
   ],
 
 
-  //可以使用一个异步函数
+  //可以使用一个异步函数 它会接受到一个 db 参数
   async db => {
     // 函数内所有内容会自动在同一个事务中执行,(只有函数类型会自动开启事务)
     // 具有隐性 commit 的命令. 如 ALTER 语句, 应该放在外部独立字符串中
@@ -43,9 +43,9 @@ module.exports = [
 
     sign: {
       //执行前的校验签名,  执行完本条 upgrade 前会进行校验, 如果失败将终止执行
-      begin: 'sha1|9071ad2edec03e446475200bfcb0c8cafaf108cc',
+      begin: '9071ad2edec03e446475200bfcb0c8cafaf108cc',
       //执行后的校验签名,  执行完本条 upgrade 后会进行校验, 如果失败将终止后续 upgrade 执行
-      end: 'sha1|9a01c24317aebc687561242a427229da37c22dd5',
+      end: '9a01c24317aebc687561242a427229da37c22dd5',
     },
     //添加注释, 会记录进 `prefix_upgrade` 表中
     comment: 'RENAME TABLE a TO aaa',

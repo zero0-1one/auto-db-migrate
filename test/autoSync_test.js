@@ -1,4 +1,4 @@
-const autoSync = require('../lib/autoSync')
+const AutoSync = require('../lib/autoSync')
 const { expect } = require('chai').use(require('chai-like'))
 const path = require('path')
 const Db = require('../lib/db')
@@ -19,7 +19,7 @@ const tempOptions = {
 }
 
 
-
+let autoSync = new AutoSync()
 describe('autoSync 测试', function () {
   let db = null
   let tempDb = null
@@ -34,7 +34,7 @@ describe('autoSync 测试', function () {
     } else {
       await autoSync.clearTempDataBase(tempDb)
     }
-    let { migration, succeed } = await autoSync.createMigration(db, tempDb)
+    let { migration, succeed } = await autoSync.createMigrationByDb(db, tempDb)
     if (!succeed) throw new Error()
     return migration
   }
@@ -91,11 +91,8 @@ describe('autoSync 测试', function () {
     it('createMigration same', async function () {
       await autoSync.initTempDbByDir(db, path.join(__dirname, 'sql/base'))
       await autoSync.cloneStructToTempDb(db, tempDb)
-      let { migration } = await autoSync.createMigration(db, tempDb)
-      expect(migration).to.be.deep.like({
-        up: [],
-        down: [],
-      })
+      let results = await autoSync.createMigrationByDb(db, tempDb)
+      expect(results).to.be.deep.like({ succeed: true, migration: [] })
     })
 
     it('createMigration add table', async function () {
@@ -105,10 +102,7 @@ describe('autoSync 测试', function () {
       for (const tableName in createTables) {
         exp.push(createTables[tableName])
       }
-      expect(migration.up.sort()).to.be.deep.equal(exp.sort())
-      expect(migration.down.sort()).to.be.deep.equal(
-        ['table_a', 'table_b', 'table_c'].map(t => 'DROP TABLE `' + t + '`').sort()
-      )
+      expect(migration.sort()).to.be.deep.equal(exp.sort())
     })
 
     it('createMigration del table', async function () {
@@ -118,30 +112,20 @@ describe('autoSync 测试', function () {
       for (const tableName in createTables) {
         exp.push(createTables[tableName])
       }
-      expect(migration.up.sort()).to.be.deep.equal(
+      expect(migration.sort()).to.be.deep.equal(
         ['table_a', 'table_b', 'table_c'].map(t => 'DROP TABLE `' + t + '`').sort()
       )
-      expect(migration.down.sort()).to.be.deep.equal(exp.sort())
     })
 
     it('createMigration rename table', async function () {
       let migration = await createMigration('base', 'rename')
-      expect(migration).to.be.deep.like({
-        up: [
-          'ALTER TABLE `table_c` RENAME TO `table_c2`',
-          'ALTER TABLE `table_a` MODIFY COLUMN `a_id` int(11) NOT NULL AUTO_INCREMENT FIRST',
-          'ALTER TABLE `table_a` ADD COLUMN `a_value1` char(12) NOT NULL DEFAULT \'\' AFTER `a_id`',
-          'ALTER TABLE `table_a` CHANGE COLUMN `a_value` `a_value2` int(11) NOT NULL AFTER `a_value1`',
-          'ALTER TABLE `table_a` RENAME KEY `a_value` TO `a_value2`'
-        ],
-        down: [
-          'ALTER TABLE `table_c2` RENAME TO `table_c`',
-          'ALTER TABLE `table_a` DROP COLUMN `a_value1`',
-          'ALTER TABLE `table_a` MODIFY COLUMN `a_id` int(11) NOT NULL AUTO_INCREMENT FIRST',
-          'ALTER TABLE `table_a` CHANGE COLUMN `a_value2` `a_value` int(11) NOT NULL AFTER `a_id`',
-          'ALTER TABLE `table_a` RENAME KEY `a_value2` TO `a_value`',
-        ],
-      })
+      expect(migration).to.be.deep.like([
+        'ALTER TABLE `table_c` RENAME TO `table_c2`',
+        'ALTER TABLE `table_a` MODIFY COLUMN `a_id` int(11) NOT NULL AUTO_INCREMENT FIRST',
+        'ALTER TABLE `table_a` ADD COLUMN `a_value1` char(12) NOT NULL DEFAULT \'\' AFTER `a_id`',
+        'ALTER TABLE `table_a` CHANGE COLUMN `a_value` `a_value2` int(11) NOT NULL AFTER `a_value1`',
+        'ALTER TABLE `table_a` RENAME KEY `a_value` TO `a_value2`'
+      ])
     })
   })
 

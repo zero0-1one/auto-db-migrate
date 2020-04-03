@@ -1,4 +1,4 @@
-const autoSync = require('../lib/autoSync')
+const AutoSync = require('../lib/autoSync')
 const { expect } = require('chai').use(require('chai-like'))
 const path = require('path')
 const Db = require('../lib/db')
@@ -19,6 +19,7 @@ const tempOptions = {
   'database': '__temp_sync__temp_db',
 }
 
+let autoSync = new AutoSync()
 
 describe('migration 测试', function () {
   let db = null
@@ -32,6 +33,7 @@ describe('migration 测试', function () {
     await autoSync.clearTempDataBase(db)
     let migration = new Migration({
       db: options,
+      tempDb: tempOptions,
       dir: path.join(__dirname, '../example'),
     })
     await migration.upgrade()
