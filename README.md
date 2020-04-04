@@ -87,6 +87,9 @@ let options = {
   //'manual': 仅生成迁移文件, 但是不执行, 需要手动在迁移文件内 将 confirm : false  改为 true
   //'off': 关闭自动同步, 非 'auto','manual' 都会被认为是 'off'
   autoSync: 'auto',
+  //autoSync 为 'auto' 时最大允许的风险值. 如果超过 maxRisk 则 autoSync 会指定转化为 'manual' 模式.
+  //默认为 10, 相当于同步要删除 5 表 或 删除 20 个字段
+  maxRisk: 5,
   //是否在 upgrade 后自动格式化所有 create table sql, 如果为 false 也可以单独调用 migration.format()
   autoFormat: true,
   //格式化规则, 默认内置的 'normal', 也可以使用数组配置多个规则组合, 更多规则查看 lib/sqlFormat.js
