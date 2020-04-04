@@ -22,7 +22,7 @@ npm install db-auto-migrate  --save
 const Migration = require('db-auto-migrate')
 const options = require('./options')
 
-async function startServer() {
+async function onServerStart() {
   let migration = new Migration(options)
   await migration.upgrade()
 }
@@ -58,15 +58,14 @@ let options = {
   /**
    * 指定的 dir 需要是下面约定的目录结构
    * migration
-   *   ├── upgrade             编写迁移文件(通过 upgradeDir 配置修改)
+   *   ├── upgrade             编写迁移文件
    *   │   ├──── v1.0.0.js     按版本编写升级逻辑, 通常只能追加而不能修改历史逻辑
    *   │   └──── v2.1.0.js     升级会按版本顺序执行
    *   │
-   *   ├── sql                 存放所有 create table .sql文件的目录(通过 sqlDir 配置修改)
+   *   ├── sql                 存放所有 create table .sql文件的目录
    *   │   ├──── account.sql   你的一些 sql 文件
    *   │   └──── log.sql
-   *   └── auto_sync           开启 autoSync 会自动生成此目录及目录内的文件(通过 autoSyncDir 配置修改),
-   *       ├                   通常不应该将它加入版本控制
+   *   └── auto_sync           开启 autoSync 会自动生成此目录及目录内的文件,通常不应该将它加入版本控制
    *       ├──── migration.js  自动生成的迁移文件,
    *       └──── .gitignore
    */
@@ -76,15 +75,12 @@ let options = {
     'host': 'localhost',
     'user': 'root',
     'password': '1',
-    'database': 'db_auto_migrate'
+    'database': 'db_auto_migrate',
   },
   //文件名前缀，非该 prefix 前缀的文件会被忽略
   prefix: '',
-  sqlDir: 'sql',
-  upgradeDir: 'upgrade',
-  autoSyncDir: 'auto_sync',
-  //是否显示console.log()
-  showLog: true,
+  //设置为 非 'development' 将只会有 Upgrade 功能生效.  默认： 'development'
+  env: 'development',
 
   //自动同步数据库结构模式, 'auto', 'manual', 'off'   默认是 manual'模式
   //'auto': 开启 根据指定目录的 create table sql 自动同步数据库
@@ -109,11 +105,12 @@ let options = {
     'host': 'localhost',
     'user': 'root',
     'password': '1',
-    'database': '__temp_sync__temp_db'
+    'database': '__temp_sync__temp_db',
   },
-
+  //是否显示console.log()
+  showLog: true,
   //是否输出 gitignore文件， 默认 true
-  gitignore: false
+  gitignore: false,
 }
 ```
 
@@ -147,11 +144,11 @@ module.exports = [
     `CREATE TABLE c (
       id int, 
       val int COMMENT 'Can be null'
-    )`
+    )`,
   ],
 
   //可以使用一个异步函数 它会接受到一个 db 参数
-  async db => {
+  async (db) => {
     // 函数内所有内容会自动在同一个事务中执行,(只有函数类型会自动开启事务)
     // 具有隐性 commit 的命令. 如 ALTER 语句, 应该放在外部独立字符串中
     await db.query('INSERT INTO a(id, val) values(1, 10)')
@@ -168,11 +165,11 @@ module.exports = [
       //执行前的校验签名,  执行完本条 upgrade 前会进行校验, 如果失败将终止执行
       begin: '9071ad2edec03e446475200bfcb0c8cafaf108cc',
       //执行后的校验签名,  执行完本条 upgrade 后会进行校验, 如果失败将终止后续 upgrade 执行
-      end: '9a01c24317aebc687561242a427229da37c22dd5'
+      end: '9a01c24317aebc687561242a427229da37c22dd5',
     },
     //添加注释, 会记录进 `prefix_upgrade` 表中
-    comment: 'RENAME TABLE a TO aaa'
-  }
+    comment: 'RENAME TABLE a TO aaa',
+  },
 ]
 ```
 

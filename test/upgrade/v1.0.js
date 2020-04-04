@@ -1,0 +1,1 @@
+module.exports = require('../../../example/upgrade/v1.0')

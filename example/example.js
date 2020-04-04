@@ -5,7 +5,7 @@ const options = require('./options')
 
 
 module.exports = {
-  async run() {
+  async onServerStart() {
     let migration = new Migration(options)
     await migration.upgrade()
   }

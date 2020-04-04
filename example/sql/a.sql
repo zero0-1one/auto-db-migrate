@@ -16,4 +16,4 @@ CREATE TABLE a3 (
   id int NOT NULL,
   val int DEFAULT NULL COMMENT 'Can be null',
   FOREIGN KEY (id) REFERENCES a (id) 
-) ENGINE=InnoDB;
+) ENGINE=InnoDB

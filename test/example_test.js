@@ -8,6 +8,6 @@ describe('example 测', function () {
       await db.query(`DROP DATABASE IF EXISTS ${db.database}`)
       await db.query(`CREATE DATABASE ${db.database}`)
     })
-    await example.run()
+    await example.onServerStart()
   })
 })
