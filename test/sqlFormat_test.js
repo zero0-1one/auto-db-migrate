@@ -206,7 +206,7 @@ describe('sqlFormat 测试', function () {
         + ') ENGINE = InnoDB DEFAULT CHARSET = utf8; ',
       exp: 'CREATE TABLE table_a (\n'
         + '  id bigint unsigned NOT NULL,\n'
-        + '  value varchar(255) NOT NULL,\n'
+        + '  value varchar(255) NOT NULL,\n\n'
         + '  FOREIGN KEY (id) REFERENCES table_b (id) ON DELETE CASCADE ON UPDATE CASCADE\n'
         + ') ENGINE=InnoDB DEFAULT CHARSET=utf8;',
     },
