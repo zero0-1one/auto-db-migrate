@@ -16,4 +16,4 @@ CREATE TABLE b3 (
   id int NOT NULL,
   val int NOT NULL,
   FOREIGN KEY (id) REFERENCES a (id) 
-) ENGINE=InnoDB
+) ENGINE=InnoDB;

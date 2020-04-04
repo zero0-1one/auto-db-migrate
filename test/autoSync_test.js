@@ -121,7 +121,6 @@ describe('autoSync 测试', function () {
       let migration = await createMigration('base', 'rename')
       expect(migration).to.be.deep.like([
         'ALTER TABLE `table_c` RENAME TO `table_c2`',
-        'ALTER TABLE `table_a` MODIFY COLUMN `a_id` int(11) NOT NULL AUTO_INCREMENT FIRST',
         'ALTER TABLE `table_a` ADD COLUMN `a_value1` char(12) NOT NULL DEFAULT \'\' AFTER `a_id`',
         'ALTER TABLE `table_a` CHANGE COLUMN `a_value` `a_value2` int(11) NOT NULL AFTER `a_value1`',
         'ALTER TABLE `table_a` RENAME KEY `a_value` TO `a_value2`'
