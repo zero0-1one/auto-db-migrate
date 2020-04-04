@@ -1,4 +1,4 @@
-# db-auto-migration
+# db-auto-migrate
 
 开发者经常需要反复调整数据库结构， 如：修改字段名、添加默认值、添加字段、添加索引、修改注释等，而手动维护费时费力。  
 `db-auto-migration` 提供了全自动数据库表结构同步。你只需要维护一份 `'CREATE TABLE'` 的`'.sql'`文件，`db-auto-migration`就会自动帮你把数据可同步至`'.sql'`文件所定义的状态。
@@ -41,7 +41,7 @@ async function onServerStart() {
 
 **注意！你不应该在生产环境下使用`AutoSync`功能。**  
 为了更好和更安全的使用 `AutoSync` 你应该了解它的进本实现，自动同步算法依赖一个空的数据库,
-在计算过程中不会对正式的数据库有任何修改。成功计算出结果后会输出到 [`auto_sync/migration.js`] 文件中。
+在计算过程中不会对正式的数据库有任何修改。成功计算出结果后会输出到 `auto_sync/migration.js` 文件中。
 然后根据 `migration.up` 进行数据库同步。
 
 ## AutoSync 与 Upgrade 区别
