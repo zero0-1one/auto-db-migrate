@@ -1,7 +1,7 @@
 # db-auto-migrate
 
 开发者经常需要反复调整数据库结构， 如：修改字段名、添加默认值、添加字段、添加索引、修改注释等，而手动维护费时费力。  
-`db-auto-migration` 提供了全自动数据库表结构同步。你只需要维护一份 `'CREATE TABLE'` 的`'.sql'`文件，`db-auto-migration`就会自动帮你把数据可同步至`'.sql'`文件所定义的状态。
+`db-auto-migrate` 提供了全自动数据库表结构同步。你只需要维护一份 `'CREATE TABLE'` 的`'.sql'`文件，`db-auto-migrate`就会自动帮你把数据可同步至`'.sql'`文件所定义的状态。
 
 ## 功能
 
