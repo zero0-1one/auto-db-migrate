@@ -23,7 +23,7 @@ const options = require('./options')
 
 async function onServerStart() {
   let migration = new Migration(options)
-  await migration.upgrade()
+  await migration.upgrade() 
 }
 ```
 
@@ -125,10 +125,10 @@ let options = {
 
 //返回 upgrade 数组,按顺序执行, 只允许向后追加, 即使是取消上一步, 也应该是在最后追加一个 upgrade
 //本地开发过程中频繁变化, 请使用 autoSync 功能, 等测试完成后, 将 autoSync 的内容追加到 upgrade 中
-//所有 upgrade 执行都会在 `db_auto_migrate__upgrade` 表中记录日志, 
+//所有 upgrade 执行都会在 `db_auto_migrate__upgrade` 表中记录日志,
 //如果异常就会终止后续不再执行, 下次执行(重启服务器) 会从上次异常处重新尝试.
 module.exports = [
-  //最简单的是使用一个 SQL 字符串, 
+  //最简单的是使用一个 SQL 字符串,
   'CREATE TABLE a (id int PRIMARY KEY, val int)',
 
   //可以指定多条 SQL 语句, 使用 ';' 隔开. 他们拥有 [1], [1-1], [1-2], ...的默认序号
@@ -149,9 +149,8 @@ module.exports = [
     )`,
   ],
 
-
   //可以使用一个异步函数 它会接受到一个 db 参数, 注意函数只能单独使用, 不能放入数组
-  async db => {
+  async (db) => {
     // 函数内所有内容会自动在同一个事务中执行,(只有函数类型会自动开启事务)
     // 具有隐性 commit 的命令. 如 ALTER 语句, 应该放在外部独立字符串中
     await db.query('INSERT INTO a(id, val) values(1, 10)')
