@@ -16,7 +16,8 @@
         "999999",
         "--colors",
         "${workspaceFolder}/test",
-        // "${workspaceFolder}/test/migration_test"
+        // "${workspaceFolder}/test/migration_test",
+        // "${workspaceFolder}/test/sqlFormat_test"
       ],
       "internalConsoleOptions": "openOnSessionStart",
       "skipFiles": [

@@ -148,6 +148,14 @@ describe('sqlFormat 测试', function () {
       sql: 'abc int(10)NOT NULL,',
       exp: 'abc int(10) NOT NULL,'
     }, {
+      rule: ['spaceBeforeComma'],
+      sql: 'key(a,b,c) NOT NULL,',
+      exp: 'key(a ,b ,c) NOT NULL ,',
+    }, {
+      rule: ['spaceAfterComma'],
+      sql: 'key(a,  b,c) NOT NULL,\nkey(a,b,c) NOT NULL,',
+      exp: 'key(a, b, c) NOT NULL,\nkey(a, b, c) NOT NULL,',
+    }, {
       rule: ['noSpaceWrapBrackets'],
       sql: 'abc int (10) NOT NULL,',
       exp: 'abc int(10)NOT NULL,'
@@ -200,7 +208,7 @@ describe('sqlFormat 测试', function () {
       rule: ['simple'],
       sql: 'CREATE TABLE table_a (\n'
         + '  id bigint(20) unsigned NOT NULL,\n'
-        + '  value varchar (255) NOT NULL,\n'
+        + '  `value` varchar (255) NOT NULL,\n'
         + '  KEY(id),\n'
         + '  CONSTRAINT \`table_a_ibfk_1\` FOREIGN KEY (\`id\`) references table_b (id)  ON UPDATE CASCADE ON DELETE CASCADE\n'
         + ') ENGINE = InnoDB DEFAULT CHARSET = utf8; ',
