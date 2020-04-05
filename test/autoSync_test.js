@@ -35,7 +35,7 @@ describe('autoSync 测试', function () {
       await autoSync.clearTempDataBase(tempDb)
     }
     let { migration, succeed } = await autoSync.createMigrationByDb(db, tempDb)
-    if (!succeed) throw new Error()
+    if (!succeed) throw new Error('未能找到迁移算法')
     return migration
   }
 

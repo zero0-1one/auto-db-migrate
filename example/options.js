@@ -57,8 +57,8 @@ module.exports = {
     'password': '1',
     'database': '__temp_sync__temp_db',
   },
-  //是否显示console.log()
-  showLog: true,
+  //logs对象(拥有 log, warn, error 方法), 默认为: console,  设置 false 将不输出日志
+  logs: false,
   //是否输出 gitignore文件， 默认 true
   gitignore: false,
 }

@@ -10,6 +10,7 @@ describe('sqlParser 测试', function () {
     let schema = sqlParser.parseCreateSql(sql.trim())
     expect(schema).to.be.deep.like({
       tableName: 'd',
+      header: {},
       options: {
         'ENGINE': "InnoDB",
         'DEFAULT CHARSET': "utf8"

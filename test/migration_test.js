@@ -34,6 +34,7 @@ describe('migration 测试', function () {
     let migration = new Migration({
       db: options,
       tempDb: tempOptions,
+      logs: false,
       dir: path.join(__dirname, '../example'),
     })
     migration.rmdir(migration.outDir())
@@ -46,6 +47,7 @@ describe('migration 测试', function () {
       db: options,
       tempDb: tempOptions,
       autoSync: 'auto',
+      logs: false,
       dir: path.join(__dirname, '../example'),
     })
     migration.rmdir(migration.outDir())
@@ -57,6 +59,7 @@ describe('migration 测试', function () {
     let opts = {
       db: options,
       tempDb: tempOptions,
+      logs: false,
       autoSync: 'auto',
       dir: path.join(__dirname, '../example'),
     }
@@ -73,6 +76,7 @@ describe('migration 测试', function () {
     let migration = new Migration({
       db: options,
       tempDb: tempOptions,
+      logs: false,
       autoSync: 'auto',
       dir: path.join(__dirname, '../example'),
     })
@@ -84,6 +88,7 @@ describe('migration 测试', function () {
     let migration = new Migration({
       db: options,
       tempDb: tempOptions,
+      logs: false,
       autoSync: 'auto',
       dir: path.join(__dirname, '../example'),
       formatByDb: true,

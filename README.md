@@ -64,8 +64,9 @@ let options = {
    *   ├── sql                 存放所有 create table .sql文件的目录
    *   │   ├──── account.sql   你的一些 sql 文件
    *   │   └──── log.sql
-   *   └── auto_sync           开启 autoSync 会自动生成此目录及目录内的文件,通常不应该将它加入版本控制
+   *   └── .auto_sync          开启 autoSync 会自动生成此目录及目录内的文件,通常不应该将它加入版本控制
    *       ├──── migration.js  自动生成的迁移文件,
+   *       ├──── .cache        为了提高效率缓存当前状态, 可以删除但不要修改内容
    *       └──── .gitignore
    */
   dir: __dirname,
@@ -109,8 +110,8 @@ let options = {
     'password': '1',
     'database': '__temp_sync__temp_db',
   },
-  //是否显示console.log()
-  showLog: true,
+  //logs对象(拥有 log, warn, error 方法), 默认为: console,  设置 false 将不输出日志
+  logs: false,
   //是否输出 gitignore文件， 默认 true
   gitignore: false,
 }
