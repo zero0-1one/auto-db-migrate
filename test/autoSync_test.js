@@ -52,15 +52,15 @@ describe('autoSync 测试', function () {
     })
   })
 
-  it('initTempDbByDir, clearTempDataBase, getCreateTables', async function () {
+  it('initTempDbByDir, clearTempDataBase, getCreateTablesByDb', async function () {
     await autoSync.initTempDbByDir(tempDb, path.join(__dirname, 'sql/base'))
     let group = autoSync.getTableGroup(path.join(__dirname, 'sql/base'))
-    let tables = await autoSync.getCreateTables(tempDb)
+    let tables = await autoSync.getCreateTablesByDb(tempDb)
     let exp = group.create.map(v => v.tableName).sort()
     expect(Object.keys(tables).sort()).to.be.deep.equal(exp)
 
     await autoSync.clearTempDataBase(tempDb)
-    let tables2 = await autoSync.getCreateTables(tempDb)
+    let tables2 = await autoSync.getCreateTablesByDb(tempDb)
     expect(tables2).to.be.deep.equal({})
   })
 
@@ -97,7 +97,7 @@ describe('autoSync 测试', function () {
 
     it('createMigration add table', async function () {
       let migration = await createMigration('', 'base')
-      let createTables = await autoSync.getCreateTables(tempDb)
+      let createTables = await autoSync.getCreateTablesByDb(tempDb)
       let exp = []
       for (const tableName in createTables) {
         exp.push(createTables[tableName])
@@ -107,7 +107,7 @@ describe('autoSync 测试', function () {
 
     it('createMigration del table', async function () {
       let migration = await createMigration('base', '')
-      let createTables = await autoSync.getCreateTables(db)
+      let createTables = await autoSync.getCreateTablesByDb(db)
       let exp = []
       for (const tableName in createTables) {
         exp.push(createTables[tableName])
