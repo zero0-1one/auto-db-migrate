@@ -25,7 +25,6 @@
     "compare-versions": "^3.4.0",
     "javascript-stringify": "^2.0.1",
     "mysql2": "^2.1.0",
-    "require-all": "^3.0.0",
     "string-similarity": "^4.0.1"
   },
   "devDependencies": {
