@@ -1,5 +1,5 @@
 {
-  "name": "db-auto-migrate",
+  "name": "auto-db-migrate",
   "version": "1.1.6",
   "description": "Automatic database migration with 'CREATE TABLE' document.",
   "main": "index.js",
@@ -37,9 +37,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zero0-1one/db-auto-migrate.git"
+    "url": "git+https://github.com/zero0-1one/auto-db-migrate.git"
   },
   "bugs": {
-    "url": "https://github.com/zero0-1one/db-auto-migrate/issues"
+    "url": "https://github.com/zero0-1one/auto-db-migrate/issues"
   }
 }

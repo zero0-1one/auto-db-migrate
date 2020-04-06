@@ -1,6 +1,6 @@
-# db-auto-migrate
+# auto-db-migrate
 
-开发过程中经常需要调整数据库结构， 如：添加新表、修改字段名、添加字段、添加索引、添加默认值、修改注释等，而手动维护费时费力。`db-auto-migrate` 提供了全自动数据库表结构同步。你只需要维护一份 `'CREATE TABLE'` 的`'.sql'`文件，`db-auto-migrate`就会自动帮你把数据库同步至`'.sql'`文件所定义的状态。
+开发过程中经常需要调整数据库结构， 如：添加新表、修改字段名、添加字段、添加索引、添加默认值、修改注释等，而手动维护费时费力。`auto-db-migrate` 提供了全自动数据库表结构同步。你只需要维护一份 `'CREATE TABLE'` 的`'.sql'`文件，`auto-db-migrate`就会自动帮你把数据库同步至`'.sql'`文件所定义的状态。
 
 ## 功能
 
@@ -14,16 +14,16 @@
 ## 使用
 
 ```
-npm install db-auto-migrate  --save
+npm install auto-db-migrate  --save
 ```
 
 ```js
-const Migration = require('db-auto-migrate')
+const Migration = require('auto-db-migrate')
 const options = require('./options')
 
 async function onServerStart() {
   let migration = new Migration(options)
-  await migration.upgrade() 
+  await migration.upgrade()
 }
 ```
 
@@ -177,7 +177,7 @@ module.exports = [
 
 ## sql 文件格式化
 
-对`create table`的`sql`文件进行格式, 更多内置规则查看[sqlFormat.js](https://github.com/zero0-1one/db-auto-migrate/blob/master/lib/sqlFormat.js),你可以按下面方式配置自己的格式规则:
+对`create table`的`sql`文件进行格式, 更多内置规则查看[sqlFormat.js](https://github.com/zero0-1one/auto-db-migrate/blob/master/lib/sqlFormat.js),你可以按下面方式配置自己的格式规则:
 
 ```js
 //options.js
