@@ -1,6 +1,6 @@
 {
   "sign": "c72dfabbc09895ee5a819a7b7d29b7b004fca74d",
-  "strRules": "simplenoTableCharset",
+  "strRules": "simple,noTableCharset",
   "formatByDb": true,
   "tables": {
     "a": "CREATE TABLE a (\n  id int NOT NULL,\n  val int NOT NULL,\n\n  PRIMARY KEY (id) \n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
