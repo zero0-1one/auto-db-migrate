@@ -119,14 +119,13 @@ let options = {
 ## upgrade 文件编写
 
 文件名必须为 version 命名规范如 `'1.0'`, `'v2.1.1'` 等 会按版本从小到大执行.
+返回 upgrade 数组, 按顺序执行, 只允许向后追加, 即使是取消上一步, 也应该是在最后追加一个 upgrade
+本地开发过程中频繁变化, 请使用 autoSync 功能, 等测试完成后, 将 autoSync 的内容追加到 upgrade 中
+所有 upgrade 执行都会在 `db_auto_migrate__upgrade` 表中记录日志,
+如果异常就会终止后续不再执行, 下次执行(重启服务器) 会从上次异常处重新尝试.
 
 ```js
 // v1.0.js
-
-//返回 upgrade 数组,按顺序执行, 只允许向后追加, 即使是取消上一步, 也应该是在最后追加一个 upgrade
-//本地开发过程中频繁变化, 请使用 autoSync 功能, 等测试完成后, 将 autoSync 的内容追加到 upgrade 中
-//所有 upgrade 执行都会在 `db_auto_migrate__upgrade` 表中记录日志,
-//如果异常就会终止后续不再执行, 下次执行(重启服务器) 会从上次异常处重新尝试.
 module.exports = [
   //最简单的是使用一个 SQL 字符串,
   'CREATE TABLE a (id int PRIMARY KEY, val int)',
@@ -158,7 +157,7 @@ module.exports = [
     // throw new Error('')   //如果抛异常 就会回滚上面两条语句
   },
 
-  //可对象配置跟多详细内容
+  //使用对象配置更多详细内容
   {
     //与外部相同, 支持单语句,多语句字符串,数组或异步函数
     up: 'ALTER TABLE a RENAME TO aaa',
