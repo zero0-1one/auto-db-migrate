@@ -8,6 +8,7 @@
   },
   "keywords": [
     "database",
+    "schema",
     "migration",
     "migrate",
     "mysql",
