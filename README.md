@@ -33,7 +33,7 @@ async function onServerStart() {
 它是单向不可逆的，如果你重命名了一个 `table` 后又想改回来，你只能向后追加新的重命名 `alter` 语句。  
 开发过程中这些小改动你可以通过 AutoSync 自动在本地实现，而不用着急的写进 `upgrade` 中，当你测试完成后再复制到 `upgrade` 中。
 
-`Upgrade` 会在数据库中创建一张 `db_auto_migrate__upgrade` 的表，并会记录所有执行过的 `upgrade`， 如果执行异常将不会向下执行。你需要手动修复 `upgrade` 后重试。
+`Upgrade` 会在数据库中创建一张 `auto_db_migrate__upgrade` 的表，并会记录所有执行过的 `upgrade`， 如果执行异常将不会向下执行。你需要手动修复 `upgrade` 后重试。
 
 ## AutoSync 介绍
 
@@ -74,7 +74,7 @@ let options = {
     'host': 'localhost',
     'user': 'root',
     'password': '1',
-    'database': 'db_auto_migrate',
+    'database': 'auto_db_migrate',
   },
   //文件名前缀，非该 prefix 前缀的文件会被忽略
   prefix: '',
@@ -121,7 +121,7 @@ let options = {
 文件名必须为 version 命名规范如 `'1.0'`, `'v2.1.1'` 等 会按版本从小到大执行.
 返回 upgrade 数组, 按顺序执行, 只允许向后追加, 即使是取消上一步, 也应该是在最后追加一个 upgrade
 本地开发过程中频繁变化, 请使用 autoSync 功能, 等测试完成后, 将 autoSync 的内容追加到 upgrade 中
-所有 upgrade 执行都会在 `db_auto_migrate__upgrade` 表中记录日志,
+所有 upgrade 执行都会在 `auto_db_migrate__upgrade` 表中记录日志,
 如果异常就会终止后续不再执行, 下次执行(重启服务器) 会从上次异常处重新尝试.
 
 ```js
