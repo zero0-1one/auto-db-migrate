@@ -4,7 +4,6 @@ const path = require('path')
 const Db = require('../lib/db')
 const Migration = require('../lib/migration')
 
-
 const options = {
   'host': 'localhost',
   'user': 'root',
@@ -92,7 +91,7 @@ describe('migration 测试', function () {
       autoSync: 'auto',
       dir: path.join(__dirname, '../example'),
       formatByDb: true,
-      formatRules: ['simple', 'noTableCharset']
+      formatRules: ['simple', 'noTableCharset'],
     })
     migration.rmdir(migration.outDir())
     await migration.format()
