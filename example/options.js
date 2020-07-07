@@ -49,6 +49,8 @@ module.exports = {
   //是否进行字段 notNull 检测，没有指定 notNull 的字段会输出一个警告，
   //可通过添加 COMMENT 以'Can be null' 或 'CBN' 开头来忽略这个警告,
   checkNotNull: true,
+  //是否检查 有无主键，没有主键的表会输出一个警告，
+  checkPrimaryKey: true,
 
   //最大试错次数
   autoSyncMaxTry: 10,
