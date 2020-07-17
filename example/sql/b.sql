@@ -3,7 +3,7 @@ CREATE TABLE b1 (
   val int NOT NULL,
 
   PRIMARY KEY (id) 
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 CREATE TABLE b2 (
@@ -11,7 +11,7 @@ CREATE TABLE b2 (
   val char(3) DEFAULT NULL COMMENT 'Can be null',
 
   FOREIGN KEY (id) REFERENCES a (id) 
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 CREATE TABLE b3 (
@@ -19,6 +19,6 @@ CREATE TABLE b3 (
   val int NOT NULL,
 
   FOREIGN KEY (id) REFERENCES a (id) 
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
