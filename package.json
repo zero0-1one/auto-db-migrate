@@ -1,6 +1,6 @@
 {
   "name": "auto-db-migrate",
-  "version": "1.1.26",
+  "version": "1.1.27",
   "description": "Automatic database migration with 'CREATE TABLE' document.",
   "main": "index.js",
   "scripts": {
