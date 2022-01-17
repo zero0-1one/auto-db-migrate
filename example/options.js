@@ -21,7 +21,7 @@ module.exports = {
   db: {
     'host': 'localhost',
     'user': 'root',
-    'password': '1',
+    'password': '',
     'database': 'auto_db_migrate',
   },
   //文件名前缀，非该 prefix 前缀的文件会被忽略
@@ -58,7 +58,7 @@ module.exports = {
   tempDb: {
     'host': 'localhost',
     'user': 'root',
-    'password': '1',
+    'password': '',
     'database': '__temp_sync__temp_db',
   },
   //logs对象(拥有 log, warn, error 方法), 默认为: console,  设置 false 将不输出日志

@@ -7,14 +7,14 @@ const Db = require('../lib/db')
 const options = {
   'host': 'localhost',
   'user': 'root',
-  'password': '1',
+  'password': '',
   'database': '__temp_sync__db',
 }
 
 const tempOptions = {
   'host': 'localhost',
   'user': 'root',
-  'password': '1',
+  'password': '',
   'database': '__temp_sync__temp_db',
 }
 

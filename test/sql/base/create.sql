@@ -2,15 +2,15 @@
 CREATE TABLE table_b (
   b_id int NOT NULL AUTO_INCREMENT,
   b_value int NOT NULL,
+  PRIMARY KEY(b_id),
   FOREIGN KEY (b_id) REFERENCES table_a (a_id) ON UPDATE CASCADE
-
-  
 ) ENGINE=InnoDB;
 
 CREATE TABLE table_c (
   c_id int NOT NULL AUTO_INCREMENT,
   c_value int NOT NULL,
   UNIQUE KEY (c_value),
+  PRIMARY KEY(c_id),
   FOREIGN KEY (c_id) REFERENCES table_a (a_id) ON UPDATE CASCADE
 )   ENGINE=InnoDB;
 

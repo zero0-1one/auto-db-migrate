@@ -32,7 +32,7 @@ module.exports = [
     // throw new Error('')   //如果抛异常 就会回滚上面两条语句
   },
 
-  //可对象配置跟多详细内容
+  //可对象配置更多详细内容
   {
     //与外部相同, 支持单语句,多语句字符串,数组或异步函数
     up: 'ALTER TABLE a RENAME TO aaa',
