@@ -78,7 +78,7 @@ let options = {
   },
   //文件名前缀，非该 prefix 前缀的文件会被忽略
   prefix: '',
-  //需要过滤的 table, 数组可以是字符串, 或 正则表达式. 默认为空(内置自动过滤 auto_db_migrate__* 系列表)
+  //需要过滤的 table, 数组可以是字符串, 或 正则表达式. 默认为空(内置自动过滤 __auto_db_migrate_logs__ 表)
   tableFilter: [],
   //设置为 非 'development' 将只会有 Upgrade 功能生效.  默认： 'development'
   env: 'development',
