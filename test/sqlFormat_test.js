@@ -95,7 +95,7 @@ describe('sqlFormat 测试', function () {
       rule: ['useCurrent'],
       sql: 'g_dtTime datetime(3) DEFAULT NOW(3) ON UPDATE NOW(3)',
       exp: 'g_dtTime datetime(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)'
-    },{
+    }, {
       rule: ['useKey'],
       sql: 'UNIQUE INDEX(abc)',
       exp: 'UNIQUE KEY(abc)'
@@ -164,6 +164,14 @@ describe('sqlFormat 测试', function () {
       sql: 'key(a,  b,c) NOT NULL,\nkey(a,b,c) NOT NULL,',
       exp: 'key(a, b, c) NOT NULL,\nkey(a, b, c) NOT NULL,',
     }, {
+      rule: ['noSpaceBeforeTypeBrackets'],
+      sql: '`dt` int  (2) NOT NULL DEFAULT current_timestamp (2),',
+      exp: '`dt` int(2) NOT NULL DEFAULT current_timestamp (2),'
+    }, {
+      rule: ['noSpaceBeforeFuncBrackets'],
+      sql: '`dt` datetime(2) NOT NULL DEFAULT current_timestamp (2),',
+      exp: '`dt` datetime(2) NOT NULL DEFAULT current_timestamp(2),'
+    }, {
       rule: ['noSpaceWrapBrackets'],
       sql: 'abc int (10) NOT NULL,',
       exp: 'abc int(10)NOT NULL,'
@@ -213,7 +221,7 @@ describe('sqlFormat 测试', function () {
         + '  CONSTRAINT \`table_a_ibfk_1\` FOREIGN KEY (\`id\`) REFERENCES table_b (id) ON DELETE CASCADE ON UPDATE CASCADE\n'
         + ') ENGINE = InnoDB DEFAULT CHARSET = utf8;',
     }, {
-      rule: ['simple'],
+      rule: ['simple', 'noBackQuote'],
       sql: 'CREATE TABLE table_a (\n'
         + '  id bigint(20) unsigned NOT NULL,\n'
         + '  `value` varchar (255) NOT NULL,\n'
