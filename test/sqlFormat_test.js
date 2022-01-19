@@ -225,12 +225,15 @@ describe('sqlFormat 测试', function () {
       sql: 'CREATE TABLE table_a (\n'
         + '  id bigint(20) unsigned NOT NULL,\n'
         + '  `value` varchar (255) NOT NULL,\n'
-        + '  KEY(id),\n'
+        + '  PRIMARY KEY(id),\n'
+        + '  KEY(value),\n'
         + '  CONSTRAINT \`table_a_ibfk_1\` FOREIGN KEY (\`id\`) references table_b (id)  ON UPDATE CASCADE ON DELETE CASCADE\n'
         + ') ENGINE = InnoDB DEFAULT CHARSET = utf8; ',
       exp: 'CREATE TABLE table_a (\n'
         + '  id bigint unsigned NOT NULL,\n'
         + '  value varchar(255) NOT NULL,\n\n'
+        + '  PRIMARY KEY (id),\n'
+        + '  KEY (value),\n'
         + '  FOREIGN KEY (id) REFERENCES table_b (id) ON DELETE CASCADE ON UPDATE CASCADE\n'
         + ') ENGINE=InnoDB DEFAULT CHARSET=utf8;',
     },
