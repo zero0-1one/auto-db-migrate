@@ -84,10 +84,18 @@ describe('sqlFormat 测试', function () {
       sql: '`g_dtTime` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
       exp: '`g_dtTime` datetime DEFAULT NOW() ON UPDATE NOW()'
     }, {
+      rule: ['useNow'],
+      sql: '`g_dtTime` datetime(2) DEFAULT CURRENT_TIMESTAMP(2) ON UPDATE CURRENT_TIMESTAMP(2)',
+      exp: '`g_dtTime` datetime(2) DEFAULT NOW(2) ON UPDATE NOW(2)'
+    }, {
       rule: ['useCurrent'],
       sql: 'g_dtTime datetime DEFAULT NOW() ON UPDATE NOW()',
       exp: 'g_dtTime datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'
     }, {
+      rule: ['useCurrent'],
+      sql: 'g_dtTime datetime(3) DEFAULT NOW(3) ON UPDATE NOW(3)',
+      exp: 'g_dtTime datetime(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)'
+    },{
       rule: ['useKey'],
       sql: 'UNIQUE INDEX(abc)',
       exp: 'UNIQUE KEY(abc)'
