@@ -88,6 +88,8 @@ let options = {
   //'manual': 仅生成迁移文件, 但是不执行, 需要手动在迁移文件内 将 confirm : false  改为 true
   //'off': 关闭自动同步, 非 'auto','manual' 都会被认为是 'off'
   autoSync: 'auto',
+  //字段相似度阈值, 大于此值的判定为字段修改, 否则判断为新的字段
+  simiThreshold: 0.7,
   //autoSync 为 'auto' 时最大允许的风险值. 如果超过 maxRisk 则 autoSync 会自动转化为 'manual' 模式.
   //默认为 5, 相当于同步要删除 5 表 或 删除 20 个字段
   maxRisk: 5,
