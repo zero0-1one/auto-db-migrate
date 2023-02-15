@@ -4,7 +4,8 @@
   "description": "Automatic database migration with 'CREATE TABLE' document.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=html --reporter=text mocha --timeout=500000 --slow=5000 test"
+    "test": "mocha test --timeout=500000 --slow=5000",
+    "coverage": "nyc mocha test report --reporter=text-lcov  --reporter=html"
   },
   "keywords": [
     "database",
@@ -32,7 +33,7 @@
     "chai": "^4.2.0",
     "chai-like": "^1.1.1",
     "mocha": "^5.2.0",
-    "nyc": "^15.0.0"
+    "nyc": "^15.1.0"
   },
   "author": "zero0-1one",
   "license": "MIT",
