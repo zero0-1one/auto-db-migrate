@@ -25,9 +25,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Create auto_db_migrate Database
-        run: mysql --host 127.0.0.1 --port 3306 -uroot -e "CREATE DATABASE IF NOT EXISTS auto_db_migrate;"
+        run: mysql --host 127.0.0.1 --port 3306 -uroot -e "CREATE DATABASE IF NOT EXISTS auto_db_migrate CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
       - name: Create __temp_sync__temp_db Database
-        run: mysql --host 127.0.0.1 --port 3306 -uroot -e "CREATE DATABASE IF NOT EXISTS __temp_sync__temp_db;"
+        run: mysql --host 127.0.0.1 --port 3306 -uroot -e "CREATE DATABASE IF NOT EXISTS __temp_sync__temp_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
       - name: Install Node - ${{ matrix.node-version }}
         uses: actions/setup-node@v2        
         with:
