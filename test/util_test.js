@@ -32,7 +32,7 @@ describe('util 测试', function () {
   })
 
 
-  it.only('removeComment  outComment', function () {
+  it('removeComment  outComment', function () {
     let outComment = []
     let string = 'line1\n/*comment1  #line2\nline3*/line3.2\nline4'
     let newString = util.removeComment(string, undefined, outComment)
