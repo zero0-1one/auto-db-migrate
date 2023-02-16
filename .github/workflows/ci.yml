@@ -24,6 +24,8 @@ jobs:
         - node-version: 16.x
     steps:
       - uses: actions/checkout@v2
+      - name: change __temp_sync__db charset
+        run: mysql --host 127.0.0.1 --port 3306 -uroot -e "ALTER DATABASE __temp_sync__db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
       - name: Create auto_db_migrate Database
         run: mysql --host 127.0.0.1 --port 3306 -uroot -e "CREATE DATABASE IF NOT EXISTS auto_db_migrate CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
       - name: Create __temp_sync__temp_db Database
