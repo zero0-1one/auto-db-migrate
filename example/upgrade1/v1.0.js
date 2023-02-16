@@ -37,12 +37,6 @@ module.exports = [
     //与外部相同, 支持单语句,多语句字符串,数组或异步函数
     up: 'ALTER TABLE a RENAME TO aaa',
 
-    sign: {
-      //执行前的校验签名,  执行完本条 upgrade 前会进行校验, 如果失败将终止执行
-      begin: '9071ad2edec03e446475200bfcb0c8cafaf108cc',
-      //执行后的校验签名,  执行完本条 upgrade 后会进行校验, 如果失败将终止后续 upgrade 执行
-      end: '9a01c24317aebc687561242a427229da37c22dd5',
-    },
     //添加注释, 会记录进 `prefix_upgrade` 表中
     comment: 'RENAME TABLE a TO aaa',
   },

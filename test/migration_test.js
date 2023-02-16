@@ -23,15 +23,11 @@ let autoSync = new AutoSync()
 describe('migration 测试', function () {
   let db = null
   let tempDb = null
-  before(async function () {
+  it('初始 db', async function () {
     db = new Db(options)
     tempDb = new Db(tempOptions)
   })
 
-  after(async function () {
-    db.close()
-    tempDb.close()
-  })
   it('upgrade', async function () {
     await autoSync.clearTempDataBase(db)
     let migration = new Migration({
@@ -39,6 +35,7 @@ describe('migration 测试', function () {
       tempDb: tempOptions,
       logs: false,
       dir: path.join(__dirname, '../example'),
+      upgradeDir: 'upgrade1'
     })
     migration.rmdir(migration.outDir())
     await migration.upgrade()
@@ -52,6 +49,7 @@ describe('migration 测试', function () {
       autoSync: 'auto',
       logs: false,
       dir: path.join(__dirname, '../example'),
+      upgradeDir: 'upgrade1'
     })
     migration.rmdir(migration.outDir())
     await migration.upgrade()
@@ -65,6 +63,7 @@ describe('migration 测试', function () {
       logs: false,
       autoSync: 'auto',
       dir: path.join(__dirname, '../example'),
+      upgradeDir: 'upgrade1'
     }
     let migration = new Migration(opts)
     migration.rmdir(migration.outDir())
@@ -101,5 +100,10 @@ describe('migration 测试', function () {
     await migration.format()
   })
 
-  
+  describe('释放 db', async function () {
+    it('release db', async function () {
+      db.close()
+      tempDb.close()
+    })
+  })
 })
