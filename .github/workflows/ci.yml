@@ -32,8 +32,6 @@ jobs:
         uses: actions/setup-node@v2        
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install sendmail
-        run: sudo apt-get install -y sendmail
       - name: Cache node modules
         uses: actions/cache@v2
         env:

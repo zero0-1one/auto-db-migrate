@@ -23,11 +23,15 @@ let autoSync = new AutoSync()
 describe('migration 测试', function () {
   let db = null
   let tempDb = null
-  it('初始 db', async function () {
+  before(async function () {
     db = new Db(options)
     tempDb = new Db(tempOptions)
   })
 
+  after(async function () {
+    db.close()
+    tempDb.close()
+  })
   it('upgrade', async function () {
     await autoSync.clearTempDataBase(db)
     let migration = new Migration({
@@ -97,10 +101,5 @@ describe('migration 测试', function () {
     await migration.format()
   })
 
-  describe('释放 db', async function () {
-    it('release db', async function () {
-      db.close()
-      tempDb.close()
-    })
-  })
+  
 })
