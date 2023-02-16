@@ -58,10 +58,7 @@ describe.only('upgrade 测试', function () {
     })
     await migration.autoSync()
     const updatePath = path.join(__dirname, EXAMPLE_DIR, UPGRADE_1_0)
-    let dir = migration.workDir(migration.options.autoSyncDir)
-    readdirSync(dir).forEach(function(file) {
-      console.log(`${dir} ${file}`)
-    })
+    migration.mkdirs(updatePath)
     copyFileSync(
       migration.autoSyncFilePath('autoUpgrade'),
       path.join(updatePath, `v${VERSION_1_0}.js`)
