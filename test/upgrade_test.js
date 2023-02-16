@@ -3,7 +3,7 @@ const { expect } = require('chai').use(require('chai-like'))
 const path = require('path')
 const Db = require('../lib/db')
 const Migration = require('../lib/migration')
-const { copyFileSync } = require('fs')
+const { copyFileSync, readdirSync } = require('fs')
 
 const options = {
   'host': 'localhost',
@@ -23,7 +23,7 @@ const VERSION_1_0 = '1.0'
 const UPGRADE_1_0 = `upgrade_${VERSION_1_0}`
 let autoSync = new AutoSync()
 
-describe('upgrade 测试', function () {
+describe.only('upgrade 测试', function () {
   let db = null
   let tempDb = null
   before(async function () {
@@ -58,6 +58,10 @@ describe('upgrade 测试', function () {
     })
     await migration.autoSync()
     const updatePath = path.join(__dirname, EXAMPLE_DIR, UPGRADE_1_0)
+    let dir = migration.workDir(migration.options.autoSyncDir)
+    readdirSync(dir).forEach(function(file) {
+      console.log(`${dir} ${file}`)
+    })
     copyFileSync(
       migration.autoSyncFilePath('autoUpgrade'),
       path.join(updatePath, `v${VERSION_1_0}.js`)
