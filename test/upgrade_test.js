@@ -23,7 +23,7 @@ const VERSION_1_0 = '1.0'
 const UPGRADE_1_0 = `upgrade_${VERSION_1_0}`
 let autoSync = new AutoSync()
 
-describe.skip('upgrade 测试', function () {
+describe('upgrade 测试', function () {
   let db = null
   let tempDb = null
   before(async function () {
