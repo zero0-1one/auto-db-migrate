@@ -35,6 +35,7 @@ describe('migration 测试', function () {
       tempDb: tempOptions,
       logs: false,
       dir: path.join(__dirname, '../example'),
+      upgradeDir: 'upgrade1'
     })
     migration.rmdir(migration.outDir())
     await migration.upgrade()
@@ -48,6 +49,7 @@ describe('migration 测试', function () {
       autoSync: 'auto',
       logs: false,
       dir: path.join(__dirname, '../example'),
+      upgradeDir: 'upgrade1'
     })
     migration.rmdir(migration.outDir())
     await migration.upgrade()
@@ -61,6 +63,7 @@ describe('migration 测试', function () {
       logs: false,
       autoSync: 'auto',
       dir: path.join(__dirname, '../example'),
+      upgradeDir: 'upgrade1'
     }
     let migration = new Migration(opts)
     migration.rmdir(migration.outDir())
