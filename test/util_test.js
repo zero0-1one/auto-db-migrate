@@ -133,7 +133,7 @@ describe('util 测试', function () {
 
   it('findByQuote', function () {
     let string = 'a-1 a-2 `a-3` a4 ab-5 a-11 \'a-2\''
-    let results = util.findByQuote(string, /\b\w-(\d+)/g, { type: 'out' })
+    let results = util.findByQuote(string, /\b\w-(\d+)/, { type: 'out' })
     expect(results).to.be.deep.equal([['a-1', '1'], ['a-11', '11']])
 
     results = util.findByQuote(string, /\b\w-(\d+)/g, { type: 'out' })
