@@ -32,12 +32,12 @@ describe('util 测试', function () {
   })
 
 
-  it('removeComment  outComment', function () {
+  it.only('removeComment  outComment', function () {
     let outComment = []
     let string = 'line1\n/*comment1  #line2\nline3*/line3.2\nline4'
     let newString = util.removeComment(string, undefined, outComment)
     expect(newString).to.be.equal('line1\nline3.2\nline4')
-    expect(outComment).to.be.deep.equal([{ str: '/*comment1  #line2\nline3*/', start: 6, end: 32 }])
+    expect(outComment).to.be.deep.equal([{ str: '/*comment1  #line2\nline3*/', start: 6, end: 32, isRemove: true }])
 
     string = 'line1\n"/*comment1"#line2\nline3*/line3.2\nline4'
     newString = util.removeComment(string)
