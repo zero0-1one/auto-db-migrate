@@ -32,7 +32,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-like": "^1.1.1",
-    "mocha": "^5.2.0",
+    "mocha": "^10.2.0",
     "nyc": "^15.1.0"
   },
   "author": "zero0-1one",
